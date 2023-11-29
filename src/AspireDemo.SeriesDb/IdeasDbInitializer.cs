@@ -40,16 +40,16 @@ internal class IdeasDbInitializer(IServiceProvider serviceProvider, ILogger<Idea
         {
             return new List<Genre>
             {
-                new Genre() { Name = "Action" },
-                new Genre() { Name = "Comedy" },
-                new Genre() { Name = "Drama" },
-                new Genre() { Name = "Fantasy" },
-                new Genre() { Name = "Horror" },
-                new Genre() { Name = "Mystery" },
-                new Genre() { Name = "Romance" },
-                new Genre() { Name = "Thriller" },
-                new Genre() { Name = "Western" },
-                new Genre() { Name = "Science-Fiction" }
+                new Genre() {Id =1, Name = "Action" },
+                new Genre() {Id =2, Name = "Comedy" },
+                new Genre() {Id =3, Name = "Drama" },
+                new Genre() {Id =4, Name = "Fantasy" },
+                new Genre() {Id =5, Name = "Horror" },
+                new Genre() {Id =6, Name = "Mystery" },
+                new Genre() {Id =7, Name = "Romance" },
+                new Genre() {Id =8, Name = "Thriller" },
+                new Genre() {Id =9, Name = "Western" },
+                new Genre() {Id =10, Name = "Science-Fiction" }
             };
         }
 
@@ -57,15 +57,15 @@ internal class IdeasDbInitializer(IServiceProvider serviceProvider, ILogger<Idea
         {
             return new List<SpecialProp>
             {
-                new SpecialProp() { Name = "Cars" },
-                new SpecialProp() { Name = "Horses" },
-                new SpecialProp() { Name = "Spaceships" },
-                new SpecialProp() { Name = "Swords" },
-                new SpecialProp() { Name = "Wands" },
-                new SpecialProp() { Name = "Dragons" },
-                new SpecialProp() { Name = "Lightsabres" },
-                new SpecialProp() { Name = "Computers" },
-                new SpecialProp() { Name = "Redis databases" }
+                new SpecialProp() {Id = 1, Name = "Cars" },
+                new SpecialProp() {Id = 2, Name = "Horses" },
+                new SpecialProp() {Id = 3, Name = "Spaceships" },
+                new SpecialProp() {Id = 4, Name = "Swords" },
+                new SpecialProp() {Id = 5, Name = "Wands" },
+                new SpecialProp() {Id = 6, Name = "Dragons" },
+                new SpecialProp() {Id = 7, Name = "Lightsabres" },
+                new SpecialProp() {Id = 8, Name = "Computers" },
+                new SpecialProp() {Id = 9, Name = "Redis databases" }
             };
         }
 
@@ -142,7 +142,7 @@ internal class IdeasDbInitializer(IServiceProvider serviceProvider, ILogger<Idea
             var genres = GetPreconfiguredGenres();
             await dbContext.Genres.AddRangeAsync(genres, cancellationToken);
 
-            logger.LogInformation("Seeding {CatalogGenresCount} catalog brands", genres.Count);
+            logger.LogInformation("Seeding {CatalogGenresCount} genres", genres.Count);
 
             await dbContext.SaveChangesAsync(cancellationToken);
         }
@@ -152,7 +152,7 @@ internal class IdeasDbInitializer(IServiceProvider serviceProvider, ILogger<Idea
             var props = GetPreconfiguredSpecialProps();
             await dbContext.SpecialProps.AddRangeAsync(props, cancellationToken);
 
-            logger.LogInformation("Seeding {SpecialPropsCount} catalog item types", props.Count);
+            logger.LogInformation("Seeding {SpecialPropsCount} special props", props.Count);
 
             await dbContext.SaveChangesAsync(cancellationToken);
         }
@@ -160,9 +160,15 @@ internal class IdeasDbInitializer(IServiceProvider serviceProvider, ILogger<Idea
         if (!dbContext.Actors.Any())
         {
             var actors = GetPreconfiguredActors();
+
+            for (int i = 0; i < actors.Count; i++)
+            {
+                actors[i].Id = i + 1;
+            }
+
             await dbContext.Actors.AddRangeAsync(actors, cancellationToken);
 
-            logger.LogInformation("Seeding {ActorsCount} catalog items", actors.Count);
+            logger.LogInformation("Seeding {ActorsCount} actors", actors.Count);
 
             await dbContext.SaveChangesAsync(cancellationToken);
         }

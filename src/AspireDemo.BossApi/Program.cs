@@ -1,4 +1,6 @@
 
+using AspireDemo.Models;
+
 namespace AspireDemo.BossApi
 {
     public class Program
@@ -27,24 +29,24 @@ namespace AspireDemo.BossApi
 
             app.UseAuthorization();
 
-            var summaries = new[]
-            {
-                "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-            };
+            app.MapPost("/plot", async (HttpContext httpContext, ReviewRequest reviewRequest) =>
+                {
+                    var prompt =
+                        $"Analyze following TV serie plot and decide whether you like it or not: {reviewRequest.Plot}";
 
-            app.MapGet("/weatherforecast", (HttpContext httpContext) => {
-                var forecast = Enumerable.Range(1, 5).Select(index =>
-                    new WeatherForecast
-                    {
-                        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                        TemperatureC = Random.Shared.Next(-20, 55),
-                        Summary = summaries[Random.Shared.Next(summaries.Length)]
-                    })
-                    .ToArray();
-                return forecast;
-            })
-            .WithName("GetWeatherForecast")
-            .WithOpenApi();
+                    // set up the client
+                    var uri = new Uri(app.Configuration["BossApiUri"]);
+                    var ollama = new OllamaApiClient(uri);
+
+                    // stream a completion and write to the console
+                    // keep reusing the context to keep the chat topic going
+                    ConversationContext context = null;
+                    var response = await ollama.GetCompletion(prompt, "elon", context);
+
+                    return Results.Ok(response.Response.Replace("\n", " "));
+                })
+                .WithName("ReviewPlot")
+                .WithOpenApi();
 
             app.Run();
         }

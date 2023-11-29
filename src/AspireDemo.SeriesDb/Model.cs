@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AspireDemo.SeriesDb;
 
@@ -15,10 +16,10 @@ public class SeriesDbContext(DbContextOptions<SeriesDbContext> options) : DbCont
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        DefineIdea(modelBuilder.Entity<Idea>());
         DefineActor(modelBuilder.Entity<Actor>());
         DefineGenre(modelBuilder.Entity<Genre>());
         DefineSpecialProp(modelBuilder.Entity<SpecialProp>());
+        DefineIdea(modelBuilder.Entity<Idea>());
     }
 
 
@@ -26,20 +27,20 @@ public class SeriesDbContext(DbContextOptions<SeriesDbContext> options) : DbCont
     {
         builder.ToTable("Idea");
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).UseHiLo("idea_hilo").IsRequired();
-        builder.Property(x => x.Plot).IsRequired();
-        builder.Property(x => x.GreenlightFromBoss).IsRequired();
-        builder.Property(x => x.BossNotes).IsRequired(false);
-        builder.HasMany(x => x.Actors).WithOne().IsRequired();
-        builder.HasOne(x => x.Genre).WithOne().IsRequired();
-        builder.HasMany(x => x.SpecialProps).WithOne().IsRequired(false);
+        builder.Property(x => x.Id).ValueGeneratedOnAdd().UseHiLo("idea_hilo");
+        builder.Property(x => x.Plot).IsRequired(false).HasMaxLength(-1);
+        builder.Property(x => x.GreenlightFromBoss).IsRequired().HasDefaultValue(false);
+        builder.Property(x => x.BossNotes).IsRequired(false).HasMaxLength(-1);
+        builder.Property(x => x.Actors).IsRequired().HasMaxLength(1000);
+        builder.Property(x => x.Genre).IsRequired().HasMaxLength(50);
+        builder.Property(x => x.SpecialProps).IsRequired(false).HasMaxLength(1000);
     }
 
     private static void DefineActor(EntityTypeBuilder<Actor> builder)
     {
         builder.ToTable("Actor");
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).UseHiLo("actor_hilo").IsRequired();
+        builder.Property(x => x.Id).ValueGeneratedOnAdd().UseHiLo("actor_hilo");
         builder.Property(x => x.FirstName).IsRequired().HasMaxLength(100);
         builder.Property(x => x.LastName).IsRequired().HasMaxLength(100);
     }
@@ -48,24 +49,25 @@ public class SeriesDbContext(DbContextOptions<SeriesDbContext> options) : DbCont
     {
         builder.ToTable("Genre");
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).UseHiLo("genre_hilo").IsRequired();
+        builder.Property(x => x.Id).ValueGeneratedOnAdd().UseHiLo("genre_hilo");
         builder.Property(x => x.Name).IsRequired().HasMaxLength(100);
     }
     private static void DefineSpecialProp(EntityTypeBuilder<SpecialProp> builder)
     {
         builder.ToTable("SpecialProp");
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).UseHiLo("special_prop_hilo").IsRequired();
+        builder.Property(x => x.Id).ValueGeneratedOnAdd().UseHiLo("special_prop_hilo");
         builder.Property(x => x.Name).IsRequired().HasMaxLength(100);
     }
 }
 
 public class Idea
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
-    public required List<Actor> Actors { get; set; }
-    public required Genre Genre { get; set; }
-    public List<SpecialProp> SpecialProps { get; set; }
+    public required string Actors { get; set; }
+    public required string Genre { get; set; }
+    public string SpecialProps { get; set; }
 
     public string Plot { get; set; }
     public bool GreenlightFromBoss { get; set; }
@@ -74,6 +76,7 @@ public class Idea
 
 public class Actor
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
@@ -81,12 +84,14 @@ public class Actor
 
 public class Genre
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     public required string Name { get; set; }
 }
 
 public class SpecialProp
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     public required string Name { get; set; }
 }
