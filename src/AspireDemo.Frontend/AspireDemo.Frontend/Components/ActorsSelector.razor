@@ -1,0 +1,65 @@
+﻿@using AspireDemo.Models.Entities
+@using AspireDemo.Frontend.Models
+
+<div class="row">
+    <div class="col">
+        @for (int i = 0; i < SelectedActors.Count; i++)
+        {
+            <ActorSelect Actors="Actors"
+                         SelectedActor="GetActorWithIndex(SelectedActors[i], i)"
+                         OnRemove="ActorRemovedCallback"
+                         OnActorChanged="ActorChangedCallback">
+            </ActorSelect>
+        }
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <button class="btn btn-primary" @onclick="AddActor">Add another</button>
+    </div>
+</div>
+
+
+@code
+{
+    [Parameter]
+    public List<Actor> Actors { get; set; }
+
+    [Parameter]
+    public List<Actor> SelectedActors { get; set; } = new List<Actor>();
+
+    private ActorWithIndex GetActorWithIndex(Actor actor, int index)
+    {
+        return new ActorWithIndex { Actor = actor, Index = index, IsEmpty = actor.Id == 0};
+    }
+
+    private void AddActor()
+    {
+        SelectedActors.Add(new Actor(){Id = 0});
+    }
+
+    private void ActorRemovedCallback(int index)
+    {
+        SelectedActors.RemoveAt(index);
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        if (SelectedActors is null)
+        {
+            SelectedActors = new List<Actor>();
+        }
+
+        if(SelectedActors.Count == 0)
+        {
+            AddActor();
+        }
+
+        return base.OnInitializedAsync();
+    }
+
+    private void ActorChangedCallback(ActorWithIndex actor)
+    {
+        SelectedActors.Insert(actor.Index, actor.Actor);
+    }
+}

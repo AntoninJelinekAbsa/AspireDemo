@@ -1,0 +1,65 @@
+﻿@using AspireDemo.Models.Entities
+@using AspireDemo.Frontend.Models
+
+<div class="row">
+    <div class="col-10">
+        <label>
+            Actor:
+            <InputSelect TValue="Actor">
+                @if(SelectedActor.IsEmpty)
+                {
+                    <option selected value="0">None</option>
+                } 
+                
+                @foreach (var actor in Actors)
+                {
+                    <option value="@actor.Id">@actor.FirstName @actor.LastName</option>
+                }
+            </InputSelect>
+        </label>
+    </div>
+    <div class="col-2">
+        <button  @onclick="Remove">Remove</button>
+    </div>
+</div>
+
+
+@code {
+
+    // Value="SelectedActor.Actor" ValueChanged="ActorChanged"
+
+    [Parameter]
+    public List<Actor> Actors { get; set; }
+
+    [Parameter]
+    public ActorWithIndex SelectedActor { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnRemove { get; set; }
+
+    [Parameter]
+    public EventCallback<ActorWithIndex> OnActorChanged { get; set; }
+
+    private async Task ActorChanged()
+    {
+        if (SelectedActor.Actor.Id > 0)
+        {
+            await OnActorChanged.InvokeAsync(SelectedActor);
+        }
+
+        // var parsed = int.TryParse(e.Value.ToString(), out var actorId);
+        // if (parsed)
+        // {
+        //     var actor = Actors.FirstOrDefault(a => a.Id == actorId);
+        //     if (actor is not null)
+        //     {
+        //         await OnActorChanged.InvokeAsync(new ActorWithIndex { Actor = actor, Index = SelectedActor.Index });
+        //     }
+        // }
+    }
+
+    private async Task Remove()
+    {
+        await OnRemove.InvokeAsync(SelectedActor.Index);
+    }
+}

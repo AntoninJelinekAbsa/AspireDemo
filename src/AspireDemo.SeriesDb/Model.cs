@@ -34,6 +34,7 @@ public class SeriesDbContext(DbContextOptions<SeriesDbContext> options) : DbCont
         builder.Property(x => x.Actors).IsRequired().HasMaxLength(1000);
         builder.Property(x => x.Genre).IsRequired().HasMaxLength(50);
         builder.Property(x => x.SpecialProps).IsRequired(false).HasMaxLength(1000);
+        builder.Property(x => x.WorkingTitle).IsRequired().HasMaxLength(100);
     }
 
     private static void DefineActor(EntityTypeBuilder<Actor> builder)
@@ -65,6 +66,7 @@ public class Idea
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
+    public required string WorkingTitle { get; set; }
     public required string Actors { get; set; }
     public required string Genre { get; set; }
     public string SpecialProps { get; set; }

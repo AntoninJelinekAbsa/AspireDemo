@@ -1,0 +1,92 @@
+﻿@page "/add"
+@rendermode InteractiveServer
+
+@using AspireDemo.Frontend.Grid
+@using AspireDemo.Frontend.Services
+@using AspireDemo.Models.Entities
+@inject SeriesApiClient ApiClient
+@inject NavigationManager Navigation
+@inject IPageHelper PageHelper
+
+@if (Idea is not null)
+{
+    <IdeaForm Busy="@Busy" 
+                 Idea="@Idea" 
+                 IsAdd="true"
+                 CancelRequest="Cancel"
+                 ValidationResult="@(async (success) => await ValidationResultAsync(success))" />
+}
+@if (Success)
+{
+    <br />
+    <div class="alert alert-success">The contact was successfully added.</div>
+}
+@if (Error)
+{
+    <br />
+    <div class="alert alert-danger">Failed to add the contact (@ErrorMessage).</div>
+}
+
+@code {
+    private Idea? Idea { get; set; }
+
+    // True when an asynchronous operation is running.
+    private bool Busy;
+
+    // True after successful add.
+    private bool Success;
+
+    // True when an error occurred.
+    private bool Error;
+
+    private string ErrorMessage = string.Empty;
+
+    // Start with fresh Contact.
+    protected override Task OnInitializedAsync()
+    {
+        Idea = new();
+        return base.OnInitializedAsync();
+    }
+
+    // Respond to a forms submission.
+    // success is True when valid.
+    private async Task ValidationResultAsync(bool success)
+    {
+        if (Busy)
+        {
+            return;
+        }
+
+        if (!success)
+        {
+            Success = false;
+            Error = false;
+            return;
+        }
+
+        Busy = true;
+
+        try
+        {
+            await ApiClient.AddIdeasAsync(Idea);
+            Success = true;
+            Error = false;
+            // Ready for the next.
+            Idea = new();
+            Busy = false;
+        }
+        catch (Exception ex)
+        {
+            Success = false;
+            Error = true;
+            ErrorMessage = ex.Message;
+            Busy = false;
+        }
+    }
+
+    // Back to list.
+    private void Cancel()
+    {
+        Navigation.NavigateTo($"/{PageHelper.Page}");
+    }
+}

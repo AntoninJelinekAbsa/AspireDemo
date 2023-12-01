@@ -1,0 +1,122 @@
+﻿@using AspireDemo.Frontend.Grid
+@using AspireDemo.Models.Entities
+
+@inject IIdeaFilters Filters
+
+@if (CurrentIdea is not null)
+{
+    <div class="row contact-detail">
+        <div class="col-1">
+            <a href="@ViewLink" alt="View Details"
+               title="View Details">
+                @CurrentIdea.WorkingTitle
+            </a>
+        </div>
+        @if (!DeleteConfirmation)
+        {
+            <div class="col-1">@CurrentIdea.Genre</div>
+            <div class="col-2">@CurrentIdea.Actors</div>
+            <div class="col-2">@CurrentIdea.SpecialProps</div>
+            <div class="col-2">@CurrentIdea.Plot</div>
+            <div class="col-1">@CurrentIdea.BossReviewResult </div>
+            <div class="col-2">@CurrentIdea.BossNotes </div>
+        }
+        else
+        {
+            <div class="col-9">
+                <DeletePrompt Confirmation="ConfirmAsync" />
+            </div>
+        }
+        
+        
+        <div class="col-1 text-right">
+            <a title="Edit" href="edit/@CurrentIdea.Id" style="text-decoration:none">
+                &nbsp;📝&nbsp;
+            </a>
+            @if (CanDelete)
+            {
+                <span @onclick="DeleteRequestAsync"
+                      title="Delete" class="clickable red">❌</span>
+            }
+            else
+            {
+                <span>&nbsp;</span>
+            }
+            &nbsp;
+        </div>
+
+    </div>
+}
+
+@code {
+    private Idea _currentIdea = new Idea();
+
+    // Contact being rendered.
+    [Parameter]
+    public Idea CurrentIdea
+    {
+        get => _currentIdea;
+        set
+        {
+            if (value is not null && !value.Equals(_currentIdea))
+            {
+                _currentIdea = value;
+                DeleteConfirmation = false;
+            }
+        }
+    }
+
+    // Event to raise when a contact delete is requested.
+    [Parameter]
+    public EventCallback DeleteIdea { get; set; }
+
+    // Overall wrapper of functionality.
+    [CascadingParameter]
+    public GridWrapper? Wrapper { get; set; }
+
+    // Returns True if conditions for delete are met.
+    private bool CanDelete => !DeleteConfirmation &&
+    (Wrapper?.DeleteRequestId == 0 ||
+    Wrapper?.DeleteRequestId == CurrentIdea?.Id);
+
+    // Navigate to view.
+    private string ViewLink => $"View/{CurrentIdea?.Id}";
+
+    // Confirm the delete.
+    private bool DeleteConfirmation { get; set; }
+
+    // Called based on confirmation.
+    // confirmed: True when confirmed.
+    private async Task ConfirmAsync(bool confirmed)
+    {
+        if (confirmed)
+        {
+            await DeleteAsync();
+        }
+        else
+        {
+            DeleteConfirmation = false;
+
+            if (Wrapper is not null)
+            {
+                await Wrapper.DeleteRequested.InvokeAsync(0);
+            }
+        }
+    }
+
+    /// Set delete to true.
+    private async Task DeleteRequestAsync()
+    {
+        if (Wrapper?.DeleteRequestId == 0)
+        {
+            DeleteConfirmation = true;
+            await Wrapper.DeleteRequested.InvokeAsync(CurrentIdea.Id);
+        }
+    }
+
+    // Deletes the Contact.
+    private Task DeleteAsync()
+    {
+        return DeleteIdea.InvokeAsync(this);
+    }
+}
