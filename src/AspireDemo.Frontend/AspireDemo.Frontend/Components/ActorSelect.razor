@@ -1,65 +1,73 @@
 ﻿@using AspireDemo.Models.Entities
 @using AspireDemo.Frontend.Models
+@using Microsoft.AspNetCore.Mvc.ApplicationParts
+
+@inject ILogger<ActorSelect> Logger 
 
 <div class="row">
-    <div class="col-10">
+    <div class="col-1">@Index</div>
+    <div class="col-4">
         <label>
             Actor:
-            <InputSelect TValue="Actor">
-                @if(SelectedActor.IsEmpty)
+            <select id="selectedActor" @onchange="ActorChanged">
+                @if(SelectedActor is null || SelectedActor.Id == 0)
                 {
                     <option selected value="0">None</option>
                 } 
                 
                 @foreach (var actor in Actors)
                 {
-                    <option value="@actor.Id">@actor.FirstName @actor.LastName</option>
+                    if(SelectedActor is not null && actor.Id == SelectedActor.Id)
+                    {
+                        Logger.LogInformation($"[ActorSelect] - Setting selected actor to {actor.FirstName} {actor.LastName}");
+                        <option selected value="@actor.Id">@actor.FirstName @actor.LastName</option>
+                    }
+                    else
+                    {
+                        <option value="@actor.Id">@actor.FirstName @actor.LastName</option>
+                    }
                 }
-            </InputSelect>
+            </select>
         </label>
     </div>
     <div class="col-2">
-        <button  @onclick="Remove">Remove</button>
+        @if(Index > 0)
+        {
+            <button type="button" class="btn btn-danger" @onclick="Remove">Remove</button>
+        }
     </div>
 </div>
 
 
 @code {
-
-    // Value="SelectedActor.Actor" ValueChanged="ActorChanged"
-
     [Parameter]
     public List<Actor> Actors { get; set; }
 
     [Parameter]
-    public ActorWithIndex SelectedActor { get; set; }
+    public Actor? SelectedActor { get; set; }
+
+    [Parameter]
+    public int Index { get; set; }
 
     [Parameter]
     public EventCallback<int> OnRemove { get; set; }
 
     [Parameter]
-    public EventCallback<ActorWithIndex> OnActorChanged { get; set; }
+    public EventCallback<Actor> OnActorChanged { get; set; }
 
-    private async Task ActorChanged()
+    private async Task ActorChanged(ChangeEventArgs e)
     {
-        if (SelectedActor.Actor.Id > 0)
+        if (int.TryParse(e.Value?.ToString(), out var actorId))
         {
-            await OnActorChanged.InvokeAsync(SelectedActor);
+            var selectedActor = Actors.FirstOrDefault(a => a.Id == actorId);
+            await OnActorChanged.InvokeAsync(selectedActor);
         }
-
-        // var parsed = int.TryParse(e.Value.ToString(), out var actorId);
-        // if (parsed)
-        // {
-        //     var actor = Actors.FirstOrDefault(a => a.Id == actorId);
-        //     if (actor is not null)
-        //     {
-        //         await OnActorChanged.InvokeAsync(new ActorWithIndex { Actor = actor, Index = SelectedActor.Index });
-        //     }
-        // }
     }
 
     private async Task Remove()
     {
-        await OnRemove.InvokeAsync(SelectedActor.Index);
+        Logger.LogInformation($"[ActorSelect] - Removing actor at index {Index}");
+        await OnRemove.InvokeAsync(Index);
+        StateHasChanged();
     }
 }

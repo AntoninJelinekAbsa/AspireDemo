@@ -1,21 +1,25 @@
 ﻿@using AspireDemo.Models.Entities
 @using AspireDemo.Frontend.Models
 
+@inject ILogger<ActorSelect> Logger
+
 <div class="row">
     <div class="col">
         @for (int i = 0; i < SelectedActors.Count; i++)
         {
+            Logger.LogInformation($"[Selector] - Rendering actor at index {i}");
             <ActorSelect Actors="Actors"
-                         SelectedActor="GetActorWithIndex(SelectedActors[i], i)"
+                         Index="i"
                          OnRemove="ActorRemovedCallback"
-                         OnActorChanged="ActorChangedCallback">
+                         OnActorChanged="ActorChangedCallback"
+                         SelectedActor="@SelectedActors[i]">
             </ActorSelect>
         }
     </div>
 </div>
 <div class="row">
     <div class="col">
-        <button class="btn btn-primary" @onclick="AddActor">Add another</button>
+        <button type="button" class="btn btn-primary" @onclick="AddActor">Add another</button>
     </div>
 </div>
 
@@ -26,21 +30,23 @@
     public List<Actor> Actors { get; set; }
 
     [Parameter]
-    public List<Actor> SelectedActors { get; set; } = new List<Actor>();
+    public List<Actor> SelectedActors { get; set; }
 
-    private ActorWithIndex GetActorWithIndex(Actor actor, int index)
-    {
-        return new ActorWithIndex { Actor = actor, Index = index, IsEmpty = actor.Id == 0};
-    }
+    [Parameter]
+    public EventCallback<List<Actor>> SelectedActorsChanged { get; set; }
 
-    private void AddActor()
+    private async Task AddActor()
     {
         SelectedActors.Add(new Actor(){Id = 0});
+        await SelectedActorsChanged.InvokeAsync(SelectedActors);
     }
 
-    private void ActorRemovedCallback(int index)
+    private async Task ActorRemovedCallback(int index)
     {
+        Logger.LogInformation($"[Selector] - Removing actor at index {index}");
         SelectedActors.RemoveAt(index);
+        await SelectedActorsChanged.InvokeAsync(SelectedActors);
+        StateHasChanged();
     }
 
     protected override Task OnInitializedAsync()
@@ -58,8 +64,28 @@
         return base.OnInitializedAsync();
     }
 
-    private void ActorChangedCallback(ActorWithIndex actor)
+    private async Task ActorChangedCallback(Actor actor)
     {
-        SelectedActors.Insert(actor.Index, actor.Actor);
+        if (!SelectedActors.Contains(actor))
+        {
+            SelectedActors.Add(actor);
+        }
+
+        if (SelectedActors.Count(x => x.Id > 0) > 0)
+        {
+            SelectedActors.RemoveAll(x => x.Id == 0);
+        }
+        await SelectedActorsChanged.InvokeAsync(SelectedActors);
+    }
+
+    private string GetSelectedActors()
+    {
+        var actors = new List<string>();
+        foreach (var actor in SelectedActors)
+        {
+            actors.Add($"{actor.FirstName} {actor.LastName}");
+        }
+
+        return string.Join(",", actors);
     }
 }

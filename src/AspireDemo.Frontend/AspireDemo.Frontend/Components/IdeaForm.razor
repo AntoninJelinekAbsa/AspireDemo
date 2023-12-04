@@ -48,9 +48,21 @@ else
 
             <p>
                 <h2>Actors</h2>
-                <ActorsSelector Actors="Actors"></ActorsSelector>
+                <ActorsSelector Actors="Actors"
+                                @bind-SelectedActors="SelectedActors">
+                </ActorsSelector>
             </p>
 
+            
+            
+            
+            <p>
+
+            </p>
+            
+            <p>
+                Selected Actors: @GetSelectedActors()
+            </p>
 
             <br/>
             <button disabled="@Busy" class="btn btn-warning"
@@ -93,6 +105,8 @@ else
     private List<Genre>? Genres { get; set; }
     private List<Actor>? Actors { get; set; }
 
+    private List<Actor> SelectedActors { get; set; }
+
     // Mode.
     private string Mode => IsAdd ? "Add" : "Edit";
 
@@ -126,5 +140,21 @@ else
     private Task HandleSubmitAsync(bool isValid)
     {
         return ValidationResult.InvokeAsync(isValid);
+    }
+
+    private string GetSelectedActors()
+    {
+        if(SelectedActors is null || SelectedActors.Count == 0)
+        {
+            return "None selected";
+        }
+        
+        var actors = new List<string>();
+        foreach (var actor in SelectedActors)
+        {
+            actors.Add($"{actor.FirstName} {actor.LastName}");
+        }
+
+        return string.Join(",", actors);
     }
 }
