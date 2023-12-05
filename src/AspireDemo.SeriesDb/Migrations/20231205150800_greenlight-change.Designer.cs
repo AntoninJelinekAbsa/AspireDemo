@@ -2,6 +2,7 @@
 using AspireDemo.SeriesDb;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AspireDemo.SeriesDb.Migrations
 {
     [DbContext(typeof(SeriesDbContext))]
-    partial class SeriesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231205150800_greenlight-change")]
+    partial class greenlightchange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

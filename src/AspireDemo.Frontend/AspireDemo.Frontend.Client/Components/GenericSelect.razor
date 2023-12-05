@@ -1,0 +1,74 @@
+﻿
+@typeparam TItem where TItem : ISelectableItem
+@inject ILogger<GenericSelect<TItem>> Logger
+
+<div class="row">
+    <div class="col-1">@Index</div>
+    <div class="col-4">
+        <label>
+            @Label:
+            <select @onchange="ItemChanged">
+                @if (SelectedItem is null || SelectedItem.Id == 0)
+                {
+                    <option selected value="0">None</option>
+                }
+
+                @foreach (var item in Items)
+                {
+                    if (SelectedItem is not null && item.Id == SelectedItem.Id)
+                    {
+                        Logger.LogDebug($"[ItemSelect] - Setting selected item to {item.Value}");
+                        <option selected value="@item.Id">@item.Value</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Id">@item.Value</option>
+                    }
+                }
+            </select>
+        </label>
+    </div>
+    <div class="col-2">
+        @if (Index > 0)
+        {
+            <button type="button" class="btn btn-danger" @onclick="Remove">Remove</button>
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string Label { get; set; }
+    
+    [Parameter]
+    public List<TItem> Items { get; set; }
+
+    [Parameter]
+    public TItem? SelectedItem { get; set; }
+
+    [Parameter]
+    public int Index { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnRemove { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> OnItemChanged { get; set; }
+
+    private async Task ItemChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var itemId))
+        {
+            var selectedItem = Items.FirstOrDefault(a => a.Id == itemId);
+            await OnItemChanged.InvokeAsync(selectedItem);
+        }
+    }
+
+    private async Task Remove()
+    {
+        Logger.LogDebug($"[ItemSelect] - Removing item at index {Index}");
+        await OnRemove.InvokeAsync(Index);
+        StateHasChanged();
+    }
+}

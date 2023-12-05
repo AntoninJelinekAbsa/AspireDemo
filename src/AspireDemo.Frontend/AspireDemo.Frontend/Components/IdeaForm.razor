@@ -1,6 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms;
 @using AspireDemo.Models.Entities
 @using AspireDemo.Frontend.Services
+@using AspireDemo.Models.Interfaces
+@using AspireDemo.Frontend.Extensions
 
 @attribute [StreamRendering]
 
@@ -47,21 +49,30 @@ else
             </p>
 
             <p>
-                <h2>Actors</h2>
-                <ActorsSelector Actors="Actors"
-                                @bind-SelectedActors="SelectedActors">
-                </ActorsSelector>
-            </p>
-
-            
-            
-            
-            <p>
-
+                <h3>Actors</h3>
+                <MultiSelector 
+                    TItem="Actor" 
+                    Items="Actors" 
+                    Label="Actor"
+                    @bind-SelectedItems="SelectedActors">
+                </MultiSelector>
             </p>
             
             <p>
-                Selected Actors: @GetSelectedActors()
+                <h3>Special props</h3>
+                <MultiSelector 
+                    TItem="SpecialProp" 
+                    Items="SpecialProps" 
+                    Label="Special property"
+                    @bind-SelectedItems="SelectedSpecialProps">
+                </MultiSelector>
+            </p>
+
+            <p>
+                Selected Actors: @GetSelectedItems(SelectedActors)
+            </p>
+            <p>
+                Selected Props: @GetSelectedItems(SelectedSpecialProps)
             </p>
 
             <br/>
@@ -104,8 +115,10 @@ else
 
     private List<Genre>? Genres { get; set; }
     private List<Actor>? Actors { get; set; }
+    private List<SpecialProp>? SpecialProps { get; set; }
 
     private List<Actor> SelectedActors { get; set; }
+    private List<SpecialProp> SelectedSpecialProps { get; set; }
 
     // Mode.
     private string Mode => IsAdd ? "Add" : "Edit";
@@ -124,10 +137,32 @@ else
             Actors = actors.ToList();
         }
 
+        var specialProps = await ApiClient.GetSpecialPropsAsync();
+        if(specialProps is not null)
+        {
+            SpecialProps = specialProps.ToList();
+        }
+
+        if (IsAdd)
+        {
+            SelectedActors = new List<Actor>();
+            SelectedSpecialProps = new List<SpecialProp>();
+        }
+
         await base.OnInitializedAsync();
     }
 
+    protected override Task OnParametersSetAsync()
+    {
 
+        if (IsAdd)
+        {
+            SelectedActors = new List<Actor>();
+            SelectedSpecialProps = new List<SpecialProp>();
+        }
+
+        return base.OnParametersSetAsync();
+    }
 
     // Ask to cancel.
     private Task CancelAsync()
@@ -139,22 +174,43 @@ else
     // isValid: True when field validation passed.
     private Task HandleSubmitAsync(bool isValid)
     {
-        return ValidationResult.InvokeAsync(isValid);
+        if (SelectedActors.Count > 2
+            && SelectedSpecialProps.Count > 2
+            && !string.IsNullOrEmpty(Idea.WorkingTitle)
+            && !string.IsNullOrEmpty(Idea.Genre))
+        {
+            Idea.Actors = JoinItemsWithAndAtTheEnd(SelectedActors.Select(x => x.Value).ToList());
+            Idea.SpecialProps = JoinItemsWithAndAtTheEnd(SelectedSpecialProps.Select(x => x.Value).ToList());
+            return ValidationResult.InvokeAsync(true);
+        }
+        return ValidationResult.InvokeAsync(false);
     }
 
-    private string GetSelectedActors()
+    private string GetSelectedItems<T> (List<T> selectedItems) where T : ISelectableItem
     {
-        if(SelectedActors is null || SelectedActors.Count == 0)
+        if(selectedItems is null || selectedItems.Count == 0)
         {
             return "None selected";
         }
         
-        var actors = new List<string>();
-        foreach (var actor in SelectedActors)
+        var items = new List<string>();
+        foreach (var item in selectedItems)
         {
-            actors.Add($"{actor.FirstName} {actor.LastName}");
+            items.Add(item.Value);
         }
 
-        return string.Join(",", actors);
+        return string.Join(",", items);
+    }
+
+    private static string JoinItemsWithAndAtTheEnd(List<string> items)
+    {
+        var actorsString = string.Join(", ", items);
+
+        if (items.Count > 1)
+        {
+            actorsString = actorsString.ReplaceLastOccurrence(", ", " and ");
+        }
+
+        return actorsString;
     }
 }

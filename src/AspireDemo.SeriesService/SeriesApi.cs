@@ -1,4 +1,5 @@
-﻿using AspireDemo.SeriesDb;
+﻿using System.Text.Json;
+using AspireDemo.SeriesDb;
 using Microsoft.EntityFrameworkCore;
 
 namespace AspireDemo.SeriesService;
@@ -92,8 +93,10 @@ public static class SeriesApi
             return retColl;
         });
 
-        group.MapPost("", async (SeriesDbContext db, Models.Entities.Idea idea) =>
+        group.MapPost("", async (SeriesDbContext db, Models.Entities.Idea idea, ILogger<string> logger) =>
         {
+            logger.LogInformation("SeriesApi.MapPost: {0}", JsonSerializer.Serialize(idea));
+            
             await db.Ideas.AddAsync(new Idea()
             {
                 WorkingTitle = idea.WorkingTitle,
@@ -101,6 +104,8 @@ public static class SeriesApi
                 Genre = idea.Genre,
                 SpecialProps = idea.SpecialProps,
             });
+
+            await db.SaveChangesAsync();
 
             return Results.Created($"/api/v1/series/{idea.Id}", idea);
         });

@@ -8,8 +8,7 @@
         public string Genre { get; set; }
         public string SpecialProps { get; set; }
         public string Plot { get; set; }
-        public bool GreenlightFromBoss { get; set; }
+        public string GreenlightFromBoss { get; set; }
         public string BossNotes { get; set; }
-        public string BossReviewResult => GreenlightFromBoss ? "Love it" : "Hate it";
     }
 }

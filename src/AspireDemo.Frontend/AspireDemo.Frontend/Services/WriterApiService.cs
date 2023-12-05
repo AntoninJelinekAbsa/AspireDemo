@@ -1,27 +1,19 @@
-﻿using Grpc.Core;
+﻿using AspireDemo.Models.Entities;
+using Grpc.Core;
 
 namespace AspireDemo.Frontend.Services;
 
 public class WriterApiService(WriterApi.GrpcWriterApi.WriterApi.WriterApiClient writerApiClient, ILogger<WriterApiService> logger)
 {
-    public async Task<string> GetPlot(string settings, List<string> actors, List<string> props)
+    public async Task<string> GetPlot(Idea idea)
     {
         var request = new WriterApi.GrpcWriterApi.WriterApiRequest
         {
-            Settings = settings,
-            Actors = {},
-            AdditionalProps = {}
+            Settings = idea.Genre,
+            WorkingTitle = idea.WorkingTitle,
+            Actors = idea.Actors,
+            AdditionalProps = idea.SpecialProps
         };
-
-        foreach (var actor in actors)
-        {
-            request.Actors.Add(actor);
-        }
-
-        foreach (var prop in props)
-        {
-            request.AdditionalProps.Add(prop);
-        }
 
         try
         {
@@ -38,5 +30,8 @@ public class WriterApiService(WriterApi.GrpcWriterApi.WriterApi.WriterApiClient 
             return string.Empty;
         }
     }
+
+
+
 }
 

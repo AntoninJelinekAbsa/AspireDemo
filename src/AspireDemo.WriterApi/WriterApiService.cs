@@ -14,10 +14,14 @@ public class WriterApiService: WriterApi.GrpcWriterApi.WriterApi.WriterApiBase
         _configuration = configuration;
     }
 
+    //TODO: try streaming response over gRPC
+
     public override async Task<WriterApiResponse> GetPlot(WriterApiRequest request, ServerCallContext context)
     {
         var prompt =
-            $"Create script for a TV series with {request.Settings} settings, starring following actors: {JoinItemsWithAndAtTheEnd(request.Actors.ToList())}. It should also involve {JoinItemsWithAndAtTheEnd(request.AdditionalProps.ToList())}";
+            $"Create script for a TV series, genre: {request.Settings} and title: {request.WorkingTitle}. Starring actors: {request.Actors}. It should also involve {request.AdditionalProps}";
+
+        _logger.LogInformation($"Prompt: {prompt}");
 
         // set up the client
         var uri = new Uri(_configuration["WriterApiUri"]);
@@ -29,37 +33,11 @@ public class WriterApiService: WriterApi.GrpcWriterApi.WriterApi.WriterApiBase
         //context = await ollama.StreamCompletion("How are you today?", "llama2", context, stream => Console.Write(stream.Response));
         var response = await ollama.GetCompletion(prompt, "grrmartin", conversationContextontext);
 
+        _logger.LogInformation($"Response: {response.Response}");
+
         return new WriterApiResponse
         {
             Plot = response.Response.Replace("\n", " ")
         };
-    }
-
-
-    private static string JoinItemsWithAndAtTheEnd(List<string> items)
-    {
-        var actorsString = string.Join(", ", items);
-
-        if (items.Count > 1)
-        {
-            actorsString = actorsString.ReplaceLastOccurrence(", ", " and ");
-        }
-
-        return actorsString;
-    }
-}
-
-public static class StringExtensions
-{
-    public static string ReplaceLastOccurrence(this string source, string find, string replace)
-    {
-        int place = source.LastIndexOf(find, StringComparison.InvariantCultureIgnoreCase);
-
-        if (place == -1)
-        {
-            return source;
-        }
-
-        return source.Remove(place, find.Length).Insert(place, replace);
     }
 }

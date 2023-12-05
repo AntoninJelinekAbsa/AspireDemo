@@ -1,7 +1,9 @@
 ﻿@using AspireDemo.Frontend.Grid
+@using AspireDemo.Frontend.Services
 @using AspireDemo.Models.Entities
 
 @inject IIdeaFilters Filters
+@inject WriterApiService WriterApiService 
 
 @if (CurrentIdea is not null)
 {
@@ -17,8 +19,20 @@
             <div class="col-1">@CurrentIdea.Genre</div>
             <div class="col-2">@CurrentIdea.Actors</div>
             <div class="col-2">@CurrentIdea.SpecialProps</div>
-            <div class="col-2">@CurrentIdea.Plot</div>
-            <div class="col-1">@CurrentIdea.BossReviewResult </div>
+            <div class="col-2">
+                @if (!string.IsNullOrWhiteSpace(CurrentIdea.Plot))
+                {
+                    @CurrentIdea.Plot
+                }
+                else
+                {
+                    <button hidden="@GeneratePlotButtonHidden" class="btn btn-secondary" @onclick="GeneratePlot" id="generatePlot">Generate Plot</button>
+                    <div hidden="@(!GeneratePlotButtonHidden)" class="spinner-border" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                }
+            </div>
+            <div class="col-1">@CurrentIdea.GreenlightFromBoss </div>
             <div class="col-2">@CurrentIdea.BossNotes </div>
         }
         else
@@ -85,6 +99,8 @@
     // Confirm the delete.
     private bool DeleteConfirmation { get; set; }
 
+    private bool GeneratePlotButtonHidden { get; set; } = false;
+
     // Called based on confirmation.
     // confirmed: True when confirmed.
     private async Task ConfirmAsync(bool confirmed)
@@ -118,5 +134,18 @@
     private Task DeleteAsync()
     {
         return DeleteIdea.InvokeAsync(this);
+    }
+
+    private async Task GeneratePlot()
+    {
+        GeneratePlotButtonHidden = true;
+        var plot = await WriterApiService.GetPlot(CurrentIdea);
+
+        if (!string.IsNullOrWhiteSpace(plot))
+        {
+            CurrentIdea.Plot = plot;
+        }
+
+        GeneratePlotButtonHidden = false;
     }
 }

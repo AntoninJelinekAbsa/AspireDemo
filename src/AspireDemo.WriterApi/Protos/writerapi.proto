@@ -9,9 +9,10 @@ service WriterApi {
 }
 
 message WriterApiRequest {
-	string settings = 1;
-	repeated string actors = 2;
-	repeated string additionalProps = 3;
+	string workingTitle = 1;
+	string settings = 2;
+	string actors = 3;
+	string additionalProps = 4;
 }
 
 message WriterApiResponse {
