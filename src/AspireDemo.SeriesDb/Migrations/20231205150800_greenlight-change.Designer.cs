@@ -2,6 +2,7 @@
 using AspireDemo.SeriesDb;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AspireDemo.SeriesDb.Migrations
 {
     [DbContext(typeof(SeriesDbContext))]
-    partial class SeriesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231205150800_greenlight-change")]
+    partial class greenlightchange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,7 +90,7 @@ namespace AspireDemo.SeriesDb.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<string>("BossReview")
+                    b.Property<string>("BossNotes")
                         .HasMaxLength(-1)
                         .HasColumnType("text");
 
@@ -95,6 +98,10 @@ namespace AspireDemo.SeriesDb.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<string>("GreenlightFromBoss")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Plot")
                         .HasMaxLength(-1)

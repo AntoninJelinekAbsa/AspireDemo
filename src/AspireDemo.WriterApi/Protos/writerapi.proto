@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "AspireDemo.WriterApi.GrpcWriterApi";
+
+package WriterApi;
+
+service WriterApi {
+	rpc GetPlot(WriterApiRequest) returns (WriterApiResponse) {}
+}
+
+message WriterApiRequest {
+	string workingTitle = 1;
+	string settings = 2;
+	string actors = 3;
+	string additionalProps = 4;
+}
+
+message WriterApiResponse {
+	string plot = 1;
+}

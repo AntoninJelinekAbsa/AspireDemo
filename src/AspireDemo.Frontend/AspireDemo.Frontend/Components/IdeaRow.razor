@@ -1,0 +1,186 @@
+﻿@using AspireDemo.Frontend.Grid
+@using AspireDemo.Frontend.Services
+@using AspireDemo.Models.Entities
+@using System.Globalization
+
+@inject IIdeaFilters Filters
+@inject WriterApiService WriterApiService 
+@inject BossApiService BossApiService
+
+@if (CurrentIdea is not null)
+{
+    <div class="row contact-detail">
+        <div class="col-1">
+            <a href="@ViewLink" alt="View Details"
+               title="View Details">
+                @CurrentIdea.WorkingTitle
+            </a>
+        </div>
+        @if (!DeleteConfirmation)
+        {
+            <div class="col-1">@CurrentIdea.Genre</div>
+            <div class="col-2">@CurrentIdea.Actors</div>
+            <div class="col-1">@CurrentIdea.SpecialProps</div>
+            <div class="col-4">
+                @if (!string.IsNullOrWhiteSpace(CurrentIdea.Plot))
+                {
+                    @CurrentIdea.Plot
+                }
+                else
+                {
+                    <button hidden="@GeneratePlotButtonHidden" class="btn btn-secondary" @onclick="GeneratePlot" id="generatePlot">Generate Plot</button>
+                    <div hidden="@(!GeneratePlotButtonHidden)" class="spinner-border" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                }
+            </div>
+            <div class="col-3">
+                @if (!string.IsNullOrEmpty(CurrentIdea.BossReview))
+                {
+                    @CurrentIdea.BossReview
+                }
+                else
+                {
+                    @if (!string.IsNullOrEmpty(CurrentIdea.Plot))
+                    {
+                        <button hidden="@GenerateReviewButtonHidden" class="btn btn-secondary" @onclick="GenerateReview" id="generatePlot">Send to boss</button>
+                        <div hidden="@(!GenerateReviewButtonHidden)" class="spinner-border" role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                    }
+                }
+            </div>
+        }
+        else
+        {
+            <div class="col-11">
+                <DeletePrompt Confirmation="ConfirmAsync" />
+            </div>
+        }
+        
+        
+       @*  <div class="col-1 text-right">
+            <a title="Edit" href="edit/@CurrentIdea.Id" style="text-decoration:none">
+                &nbsp;📝&nbsp;
+            </a>
+            @if (CanDelete)
+            {
+                <span @onclick="DeleteRequestAsync"
+                      title="Delete" class="clickable red">❌</span>
+            }
+            else
+            {
+                <span>&nbsp;</span>
+            }
+            &nbsp;
+        </div> *@
+
+    </div>
+}
+
+@code {
+    private Idea _currentIdea = new Idea();
+
+    // Contact being rendered.
+    [Parameter]
+    public Idea CurrentIdea
+    {
+        get => _currentIdea;
+        set
+        {
+            if (value is not null && !value.Equals(_currentIdea))
+            {
+                _currentIdea = value;
+                DeleteConfirmation = false;
+            }
+        }
+    }
+
+    // Event to raise when a contact delete is requested.
+    [Parameter]
+    public EventCallback DeleteIdea { get; set; }
+
+    [Parameter]
+    public EventCallback<Idea> OnIdeaChanged { get; set; }
+
+    // Overall wrapper of functionality.
+    [CascadingParameter]
+    public GridWrapper? Wrapper { get; set; }
+
+    // Returns True if conditions for delete are met.
+    private bool CanDelete => !DeleteConfirmation &&
+    (Wrapper?.DeleteRequestId == 0 ||
+    Wrapper?.DeleteRequestId == CurrentIdea?.Id);
+
+    // Navigate to view.
+    private string ViewLink => $"View/{CurrentIdea?.Id}";
+
+    // Confirm the delete.
+    private bool DeleteConfirmation { get; set; }
+
+    private bool GeneratePlotButtonHidden { get; set; } = false;
+    private bool GenerateReviewButtonHidden { get; set; } = false;
+
+    // Called based on confirmation.
+    // confirmed: True when confirmed.
+    private async Task ConfirmAsync(bool confirmed)
+    {
+        if (confirmed)
+        {
+            await DeleteAsync();
+        }
+        else
+        {
+            DeleteConfirmation = false;
+
+            if (Wrapper is not null)
+            {
+                await Wrapper.DeleteRequested.InvokeAsync(0);
+            }
+        }
+    }
+
+    /// Set delete to true.
+    private async Task DeleteRequestAsync()
+    {
+        if (Wrapper?.DeleteRequestId == 0)
+        {
+            DeleteConfirmation = true;
+            await Wrapper.DeleteRequested.InvokeAsync(CurrentIdea.Id);
+        }
+    }
+
+    // Deletes the Contact.
+    private Task DeleteAsync()
+    {
+        return DeleteIdea.InvokeAsync(this);
+    }
+    
+    private async Task GeneratePlot()
+    {
+        GeneratePlotButtonHidden = true;
+        var plot = await WriterApiService.GetPlot(CurrentIdea);
+
+        if (!string.IsNullOrWhiteSpace(plot))
+        {
+            CurrentIdea.Plot = plot;
+            await OnIdeaChanged.InvokeAsync(CurrentIdea);
+        }
+
+        GeneratePlotButtonHidden = false;
+    }
+
+    private async Task GenerateReview()
+    {
+        GenerateReviewButtonHidden = true;
+        var result = await BossApiService.GetReview(CurrentIdea);
+
+        if (!string.IsNullOrEmpty(result))
+        {
+            CurrentIdea.BossReview = result;
+            await OnIdeaChanged.InvokeAsync(CurrentIdea);
+        }
+
+        GenerateReviewButtonHidden = false;
+    }
+}

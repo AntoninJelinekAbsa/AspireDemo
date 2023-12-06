@@ -3,7 +3,7 @@ using AspireDemo.SeriesDb;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddNpgsqlDbContext<SeriesDbContext>("ideasDb");
+builder.AddNpgsqlDbContext<SeriesDbContext>("seriesDb");
 
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracing => tracing.AddSource(IdeasDbInitializer.ActivitySourceName));

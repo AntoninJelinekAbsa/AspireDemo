@@ -1,0 +1,209 @@
+﻿@using Microsoft.AspNetCore.Components.Forms;
+@using AspireDemo.Models.Entities
+@using AspireDemo.Frontend.Services
+@using AspireDemo.Models.Interfaces
+@using AspireDemo.Frontend.Extensions
+
+@attribute [StreamRendering]
+
+@inject SeriesApiClient ApiClient
+
+<h1>@Mode Idea</h1>
+
+<hr />
+@if(Genres is null || Actors is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if (Idea is not null)
+    {
+        <EditForm Model="@Idea"
+                  OnInvalidSubmit="(async () => await HandleSubmitAsync(false))"
+                  OnValidSubmit="(async () => await HandleSubmitAsync(true))">
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
+
+            <p>
+                <label>
+                    Working title:
+                    <InputText @bind-Value="Idea.WorkingTitle"/>
+                </label>
+            </p>
+            <p>
+                <label>
+                    Genre:
+                    <InputSelect @bind-Value="Idea.Genre">
+                        @if (Idea is null)
+                        {
+                            <option selected value="">None</option>
+                        }
+
+                        @foreach (var genre in Genres)
+                        {
+                            <option value="@genre.Name">@genre.Name</option>
+                        }
+                    </InputSelect>
+                </label>
+            </p>
+
+            <p>
+                <h3>Actors</h3>
+                <MultiSelector 
+                    TItem="Actor" 
+                    Items="Actors" 
+                    Label="Actor"
+                    @bind-SelectedItems="SelectedActors">
+                </MultiSelector>
+            </p>
+            
+            <p>
+                <h3>Special props</h3>
+                <MultiSelector 
+                    TItem="SpecialProp" 
+                    Items="SpecialProps" 
+                    Label="Special property"
+                    @bind-SelectedItems="SelectedSpecialProps">
+                </MultiSelector>
+            </p>
+
+            <br/>
+            <button disabled="@Busy" class="btn btn-warning"
+                    @onclick="CancelAsync">
+                Cancel
+            </button>&nbsp;
+            <button disabled="@Busy" type="submit"
+                    class="btn btn-primary">
+                Submit
+            </button>
+        </EditForm>
+    }
+}
+
+@code {
+    // Let parent handle result of validation.
+    [Parameter]
+    public EventCallback<bool> ValidationResult { get; set; }
+
+    // Let parent handle what to do on cancel.
+    [Parameter]
+    public EventCallback CancelRequest { get; set; }
+
+    // True if add mode.
+    [Parameter]
+    public bool IsAdd { get; set; }
+
+    // The Contact to upsert.
+    [Parameter]
+    public Idea? Idea { get; set; }
+
+    // The database version of Contact if a concurrency issue.
+    [Parameter]
+    public Idea? DbIdea { get; set; }
+
+    // Prevent multiple asynchronous operations at the same time.
+    [Parameter]
+    public bool Busy { get; set; }
+
+    private List<Genre>? Genres { get; set; }
+    private List<Actor>? Actors { get; set; }
+    private List<SpecialProp>? SpecialProps { get; set; }
+
+    private List<Actor> SelectedActors { get; set; }
+    private List<SpecialProp> SelectedSpecialProps { get; set; }
+
+    // Mode.
+    private string Mode => IsAdd ? "Add" : "Edit";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var genres = await ApiClient.GetGenresAsync();
+        if (genres is not null)
+        {
+            Genres = genres.ToList();
+        }
+
+        var actors = await ApiClient.GetActorsAsync();
+        if (actors is not null)
+        {
+            Actors = actors.ToList();
+        }
+
+        var specialProps = await ApiClient.GetSpecialPropsAsync();
+        if(specialProps is not null)
+        {
+            SpecialProps = specialProps.ToList();
+        }
+
+        if (IsAdd)
+        {
+            SelectedActors = new List<Actor>();
+            SelectedSpecialProps = new List<SpecialProp>();
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+
+        if (IsAdd)
+        {
+            SelectedActors = new List<Actor>();
+            SelectedSpecialProps = new List<SpecialProp>();
+        }
+
+        return base.OnParametersSetAsync();
+    }
+
+    // Ask to cancel.
+    private Task CancelAsync()
+    {
+        return CancelRequest.InvokeAsync(null);
+    }
+
+    // Handle form submission request.
+    // isValid: True when field validation passed.
+    private Task HandleSubmitAsync(bool isValid)
+    {
+        if (SelectedActors.Count > 2
+            && SelectedSpecialProps.Count > 2
+            && !string.IsNullOrEmpty(Idea.WorkingTitle)
+            && !string.IsNullOrEmpty(Idea.Genre))
+        {
+            Idea.Actors = JoinItemsWithAndAtTheEnd(SelectedActors.Select(x => x.Value).ToList());
+            Idea.SpecialProps = JoinItemsWithAndAtTheEnd(SelectedSpecialProps.Select(x => x.Value).ToList());
+            return ValidationResult.InvokeAsync(true);
+        }
+        return ValidationResult.InvokeAsync(false);
+    }
+
+    private string GetSelectedItems<T> (List<T> selectedItems) where T : ISelectableItem
+    {
+        if(selectedItems is null || selectedItems.Count == 0)
+        {
+            return "None selected";
+        }
+        
+        var items = new List<string>();
+        foreach (var item in selectedItems)
+        {
+            items.Add(item.Value);
+        }
+
+        return string.Join(",", items);
+    }
+
+    private static string JoinItemsWithAndAtTheEnd(List<string> items)
+    {
+        var actorsString = string.Join(", ", items);
+
+        if (items.Count > 1)
+        {
+            actorsString = actorsString.ReplaceLastOccurrence(", ", " and ");
+        }
+
+        return actorsString;
+    }
+}

@@ -1,0 +1,89 @@
+﻿
+@typeparam TItem where TItem : ISelectableItem, new()
+
+@inject ILogger<MultiSelector<TItem>> Logger
+
+<div class="row">
+    <div class="col">
+        @for (int i = 0; i < SelectedItems.Count; i++)
+        {
+            Logger.LogDebug($"[MultiSelector] - Rendering item at index {i}");
+            <GenericSelect 
+                TItem="TItem"
+                Items="Items"
+                Label="@Label"
+                Index="i"
+                OnRemove="ItemRemovedCallback"
+                OnItemChanged="ItemChangedCallback"
+                SelectedItem="@SelectedItems[i]">
+            </GenericSelect>
+        }
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <button type="button" class="btn btn-primary" @onclick="AddItem">Add another</button>
+    </div>
+</div>
+
+
+@code
+{
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public List<TItem> Items { get; set; }
+
+    [Parameter]
+    public List<TItem> SelectedItems { get; set; }
+
+    [Parameter]
+    public EventCallback<List<TItem>> SelectedItemsChanged { get; set; }
+
+    private async Task AddItem()
+    {
+        SelectedItems.Add(new TItem(){Id = 0});
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+    }
+
+    private async Task ItemRemovedCallback(int index)
+    {
+        Logger.LogDebug($"[MultiSelector] - Removing actor at index {index}");
+        SelectedItems.RemoveAt(index);
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (SelectedItems is null)
+        {
+            SelectedItems = new List<TItem>();
+        }
+
+        if(SelectedItems.Count == 0)
+        {
+            await AddItem();
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task ItemChangedCallback(TItem item)
+    {
+        if(item is ISelectableItem selectableItem)
+        {
+            if (SelectedItems.All(x => x.Id != selectableItem.Id))
+            {
+                SelectedItems.Add(item);
+            }
+
+            if (SelectedItems.Count(x => x.Id > 0) > 0)
+            {
+                SelectedItems.RemoveAll(x => x.Id == 0);
+            }
+            await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        }
+    }
+}

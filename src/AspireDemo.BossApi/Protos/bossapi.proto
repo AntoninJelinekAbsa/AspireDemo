@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "AspireDemo.BossApi.GrpcBossApi";
+
+package BossApi;
+
+service BossApi {
+	rpc GetReview(ReviewRequest) returns (ReviewResponse) {}
+}
+
+message ReviewRequest {
+	string plot = 1;
+}
+
+message ReviewResponse {
+	string result = 1;
+}
