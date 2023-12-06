@@ -68,13 +68,6 @@ else
                 </MultiSelector>
             </p>
 
-            <p>
-                Selected Actors: @GetSelectedItems(SelectedActors)
-            </p>
-            <p>
-                Selected Props: @GetSelectedItems(SelectedSpecialProps)
-            </p>
-
             <br/>
             <button disabled="@Busy" class="btn btn-warning"
                     @onclick="CancelAsync">

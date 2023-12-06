@@ -3,11 +3,10 @@
 @inject ILogger<GenericSelect<TItem>> Logger
 
 <div class="row">
-    <div class="col-1">@Index</div>
-    <div class="col-4">
+    <div class="col">
         <label>
             @Label:
-            <select @onchange="ItemChanged">
+            <select @onchange="ItemChanged" class="form-control">
                 @if (SelectedItem is null || SelectedItem.Id == 0)
                 {
                     <option selected value="0">None</option>
@@ -28,7 +27,7 @@
             </select>
         </label>
     </div>
-    <div class="col-2">
+    <div class="col">
         @if (Index > 0)
         {
             <button type="button" class="btn btn-danger" @onclick="Remove">Remove</button>

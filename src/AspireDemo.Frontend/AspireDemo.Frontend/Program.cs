@@ -2,18 +2,22 @@ using AspireDemo.Frontend.Components;
 using AspireDemo.Frontend.Services;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using AspireDemo.Frontend.Extensions;
-using AspireDemo.WriterApi.GrpcWriterApi;
 using AspireDemo.Frontend.Grid;
+
+using AspireDemo.WriterApi.GrpcWriterApi;
+using AspireDemo.BossApi.GrpcBossApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddSingleton<WriterApiService>()
     .AddGrpcServiceReference<WriterApi.WriterApiClient>("https://localhost:7292", failureStatus: HealthStatus.Degraded);
+
+builder.Services.AddSingleton<BossApiService>()
+    .AddGrpcServiceReference<BossApi.BossApiClient>("https://localhost:7293", failureStatus: HealthStatus.Degraded);
 
 builder.Services.AddHttpServiceReference<SeriesApiClient>("https://localhost:7122", healthRelativePath: "readiness");
 

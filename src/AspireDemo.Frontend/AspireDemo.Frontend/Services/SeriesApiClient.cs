@@ -1,4 +1,5 @@
-﻿using AspireDemo.Models.Entities;
+﻿using System.Text.Json;
+using AspireDemo.Models.Entities;
 
 namespace AspireDemo.Frontend.Services;
 
@@ -36,9 +37,10 @@ public class SeriesApiClient(HttpClient client, ILogger<SeriesApiClient> logger)
         return false;
     }
 
-    public async Task<bool> UpdateIdeaPlot(int ideaId, string plot)
+    public async Task<bool> UpdateIdea(Idea idea)
     {
-        var updateIdeaResponse = await client.PutAsJsonAsync(SeriesApiBase + $"/{ideaId}", plot);
+        logger.LogInformation("SeriesApiClient.UpdateIdea: {0}", JsonSerializer.Serialize(idea));
+        var updateIdeaResponse = await client.PutAsJsonAsync(SeriesApiBase, idea);
 
         if (updateIdeaResponse.IsSuccessStatusCode)
         {

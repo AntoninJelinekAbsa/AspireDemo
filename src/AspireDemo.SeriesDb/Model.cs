@@ -29,8 +29,7 @@ public class SeriesDbContext(DbContextOptions<SeriesDbContext> options) : DbCont
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedOnAdd().UseHiLo("idea_hilo");
         builder.Property(x => x.Plot).IsRequired(false).HasMaxLength(-1);
-        builder.Property(x => x.GreenlightFromBoss).IsRequired(false).HasMaxLength(20);
-        builder.Property(x => x.BossNotes).IsRequired(false).HasMaxLength(-1);
+        builder.Property(x => x.BossReview).IsRequired(false).HasMaxLength(-1);
         builder.Property(x => x.Actors).IsRequired().HasMaxLength(1000);
         builder.Property(x => x.Genre).IsRequired().HasMaxLength(50);
         builder.Property(x => x.SpecialProps).IsRequired(false).HasMaxLength(1000);
@@ -70,10 +69,8 @@ public class Idea
     public required string Actors { get; set; }
     public required string Genre { get; set; }
     public string SpecialProps { get; set; }
-
     public string Plot { get; set; }
-    public string GreenlightFromBoss { get; set; }
-    public string BossNotes { get; set; }
+    public string BossReview { get; set; }
 }
 
 public class Actor

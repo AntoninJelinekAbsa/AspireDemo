@@ -85,8 +85,7 @@ public static class SeriesApi
                     Genre = idea.Genre,
                     SpecialProps = idea.SpecialProps,
                     Plot = idea.Plot,
-                    GreenlightFromBoss = idea.GreenlightFromBoss,
-                    BossNotes = idea.BossNotes
+                    BossReview = idea.BossReview
                 });
             }
 
@@ -110,16 +109,19 @@ public static class SeriesApi
             return Results.Created($"/api/v1/series/{idea.Id}", idea);
         });
 
-        group.MapPut("{id:int}/plot", async (int id, SeriesDbContext db, string plot) =>
+        group.MapPut("", async (SeriesDbContext db, Models.Entities.Idea idea, ILogger<string> logger) =>
         {
-            var dbIdea = await db.Ideas.FirstOrDefaultAsync(x => x.Id == id);
+            logger.LogInformation("SeriesApi.MapPut: {0}", JsonSerializer.Serialize(idea));
+
+            var dbIdea = await db.Ideas.FirstOrDefaultAsync(x => x.Id == idea.Id);
 
             if (dbIdea == null)
             {
                 return Results.NotFound();
             }
 
-            dbIdea.Plot = plot;
+            dbIdea.Plot = idea.Plot;
+            dbIdea.BossReview = idea.BossReview;
             await db.SaveChangesAsync();
             return Results.Created();
         });

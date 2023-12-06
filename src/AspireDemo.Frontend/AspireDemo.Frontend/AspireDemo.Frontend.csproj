@@ -21,6 +21,7 @@
 
 	<ItemGroup>
 		<Protobuf Include="..\..\AspireDemo.WriterApi\Protos\writerapi.proto " GrpcServices="Client" Link="WriterApi\Protos\writerapi.proto" />
+		<Protobuf Include="..\..\AspireDemo.BossApi\Protos\bossapi.proto " GrpcServices="Client" Link="BossApi\Protos\bossapi.proto" />
 	</ItemGroup>
 
 </Project>
