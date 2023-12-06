@@ -1,0 +1,66 @@
+name: Aspire.Demo
+services:
+  - name: PostgresDatabase
+    image: postgres
+    bindings: 
+      - port: 5432
+        protocol: tcp
+    env:
+      - name: POSTGRES_PASSWORD
+        value: p@ssword123
+      - name: POSTGRES_USER
+        value: SeriesUser
+      - name: POSTGRES_DB
+        value: SeriesDb
+
+  - name: WriterAI
+    image: grrmartin
+    bindings:
+      - port: 11434
+        protocol: tcp
+
+  - name: BossAI
+    image: elon
+    bindings:
+      - port: 11435
+        containerPort: 11434
+        protocol: tcp
+
+  - name: SeriesDb
+    project: src/AspireDemo.SeriesDb/AspireDemo.SeriesDb.csproj
+    env:
+      - name: ASPNETCORE_ENVIRONMENT
+        value: development
+
+  - name: SeriesService
+    project: src/AspireDemo.SeriesService/AspireDemo.SeriesService.csproj
+    bindings:
+      - port: 7122
+        protocol: https
+    env:
+      - name: ASPNETCORE_ENVIRONMENT
+        value: development
+      - name: ENVIRONMENT
+        value: development
+      
+  - name: WriterApi
+    project: src/AspireDemo.WriterApi/AspireDemo.WriterApi.csproj
+    bindings:
+      - port: 7292
+        protocol: https
+    env:
+      - name: ASPNETCORE_ENVIRONMENT
+        value: development
+      - name: ENVIRONMENT
+        value: development
+
+  - name: BossApi
+    project: src/AspireDemo.BossApi/AspireDemo.BossApi.csproj
+    bindings:
+      - port: 7293
+        protocol: https
+    env:
+      - name: ASPNETCORE_ENVIRONMENT
+        value: development
+      - name: ENVIRONMENT
+        value: development

@@ -20,6 +20,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{DAC1DC38-44F4-413A-A34C-4C1910E01D8A}"
 	ProjectSection(SolutionItems) = preProject
 		notes.md = notes.md
+		tye-run.bat = tye-run.bat
+		tye.yaml = tye.yaml
 	EndProjectSection
 EndProject
 Global
