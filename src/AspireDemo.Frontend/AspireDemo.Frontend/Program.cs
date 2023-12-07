@@ -9,17 +9,19 @@ using AspireDemo.BossApi.GrpcBossApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddSingleton<WriterApiService>()
-    .AddGrpcServiceReference<WriterApi.WriterApiClient>("https://localhost:7292", failureStatus: HealthStatus.Degraded);
+    .AddGrpcServiceReference<WriterApi.WriterApiClient>("http://writerApi", failureStatus: HealthStatus.Degraded);
 
 builder.Services.AddSingleton<BossApiService>()
-    .AddGrpcServiceReference<BossApi.BossApiClient>("https://localhost:7293", failureStatus: HealthStatus.Degraded);
+    .AddGrpcServiceReference<BossApi.BossApiClient>("http://bossApi", failureStatus: HealthStatus.Degraded);
 
-builder.Services.AddHttpServiceReference<SeriesApiClient>("https://localhost:7122", healthRelativePath: "readiness");
+builder.Services.AddHttpServiceReference<SeriesApiClient>("http://seriesService", healthRelativePath: "readiness");
 
 // Pager
 builder.Services.AddScoped<IPageHelper, PageHelper>();
@@ -28,6 +30,7 @@ builder.Services.AddScoped<IPageHelper, PageHelper>();
 builder.Services.AddScoped<IIdeaFilters, GridControls>();
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -50,6 +53,8 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(AspireDemo.Frontend.Client._Imports).Assembly);
+
+app.MapDefaultEndpoints();
 
 app.Run();
 

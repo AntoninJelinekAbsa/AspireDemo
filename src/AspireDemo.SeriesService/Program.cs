@@ -3,6 +3,8 @@ using AspireDemo.SeriesService;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 builder.AddNpgsqlDbContext<SeriesDbContext>("seriesDb");
 
 // Add services to the container.
@@ -12,6 +14,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

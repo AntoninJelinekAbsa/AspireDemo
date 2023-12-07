@@ -3,6 +3,8 @@ using AspireDemo.SeriesDb;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 builder.AddNpgsqlDbContext<SeriesDbContext>("seriesDb");
 
 builder.Services.AddOpenTelemetry()
@@ -15,5 +17,7 @@ builder.Services.AddHealthChecks()
     .AddCheck<IdeasDbInitializerHealthCheck>("DbInitializer", null);
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 await app.RunAsync();

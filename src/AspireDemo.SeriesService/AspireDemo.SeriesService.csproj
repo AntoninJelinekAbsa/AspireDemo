@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AspireDemo.Models\AspireDemo.Models.csproj" />
     <ProjectReference Include="..\AspireDemo.SeriesDb\AspireDemo.SeriesDb.csproj" />
+    <ProjectReference Include="..\Aspire\Aspire.ServiceDefaults\Aspire.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

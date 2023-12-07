@@ -20,7 +20,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{DAC1DC38-44F4-413A-A34C-4C1910E01D8A}"
 	ProjectSection(SolutionItems) = preProject
 		notes.md = notes.md
+		tye-run.bat = tye-run.bat
+		tye.yaml = tye.yaml
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspire.AppHost", "src\Aspire\Aspire.AppHost\Aspire.AppHost.csproj", "{3C12CD53-911F-4853-A861-B33B30B089DA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aspire.ServiceDefaults", "src\Aspire\Aspire.ServiceDefaults\Aspire.ServiceDefaults.csproj", "{D2949A02-51AD-4D22-9A4E-405023427AB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,6 +62,14 @@ Global
 		{FBBAD198-CFFB-44C4-B9A3-B9A84EA84389}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBBAD198-CFFB-44C4-B9A3-B9A84EA84389}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBBAD198-CFFB-44C4-B9A3-B9A84EA84389}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C12CD53-911F-4853-A861-B33B30B089DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C12CD53-911F-4853-A861-B33B30B089DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C12CD53-911F-4853-A861-B33B30B089DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C12CD53-911F-4853-A861-B33B30B089DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2949A02-51AD-4D22-9A4E-405023427AB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2949A02-51AD-4D22-9A4E-405023427AB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2949A02-51AD-4D22-9A4E-405023427AB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2949A02-51AD-4D22-9A4E-405023427AB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

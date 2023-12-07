@@ -4,6 +4,18 @@ docker run --hostname=21b227157a31 --mac-address=02:42:ac:11:00:04 --env=POSTGRE
 ```
 
 
+Aspire
+
+Install workload (can be done via Visual Studio installer):
+```
+dotnet workload install aspire
+```
+
+
+
+
+
+
 
 
 
