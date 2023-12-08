@@ -16,7 +16,11 @@ dotnet workload install aspire
 
 
 
-
+Deployment
+- manifest:
+```
+ dotnet run --publisher manifest --output-path aspire-manifest.json
+```
 
 
 
