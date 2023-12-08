@@ -25,6 +25,10 @@
                 @if (!string.IsNullOrWhiteSpace(CurrentIdea.Plot))
                 {
                     @CurrentIdea.Plot
+
+                    <div class="right-bottom" hidden="@PlotGenerationCompleted">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
                 }
                 else
                 {
@@ -38,6 +42,10 @@
                 @if (!string.IsNullOrEmpty(CurrentIdea.BossReview))
                 {
                     @CurrentIdea.BossReview
+
+                    <div class="right-bottom" hidden="@PlotGenerationCompleted">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
                 }
                 else
                 {
@@ -121,6 +129,9 @@
     private bool GeneratePlotButtonHidden { get; set; } = false;
     private bool GenerateReviewButtonHidden { get; set; } = false;
 
+    private bool PlotGenerationCompleted { get; set; } = false;
+    private bool ReviewGenerationCompleted { get; set; } = false;
+
     // Called based on confirmation.
     // confirmed: True when confirmed.
     private async Task ConfirmAsync(bool confirmed)
@@ -159,28 +170,38 @@
     private async Task GeneratePlot()
     {
         GeneratePlotButtonHidden = true;
-        var plot = await WriterApiService.GetPlot(CurrentIdea);
 
-        if (!string.IsNullOrWhiteSpace(plot))
+        string plot = "";
+
+        WriterApiService.PlotUpdateReceivedCallback = async (plotUpdate) =>
         {
+            plot += plotUpdate;
             CurrentIdea.Plot = plot;
-            await OnIdeaChanged.InvokeAsync(CurrentIdea);
-        }
+            StateHasChanged();
+        };
+        
+        await WriterApiService.GetPlotStream(CurrentIdea, new CancellationToken());
 
-        GeneratePlotButtonHidden = false;
+        await OnIdeaChanged.InvokeAsync(CurrentIdea);
+        PlotGenerationCompleted = true;
     }
 
     private async Task GenerateReview()
     {
         GenerateReviewButtonHidden = true;
-        var result = await BossApiService.GetReview(CurrentIdea);
+        
+        string review = "";
 
-        if (!string.IsNullOrEmpty(result))
+        BossApiService.ReviewUpdateReceivedCallback = async (reviewUpdate) =>
         {
-            CurrentIdea.BossReview = result;
-            await OnIdeaChanged.InvokeAsync(CurrentIdea);
-        }
+            review += reviewUpdate;
+            CurrentIdea.BossReview = review;
+            StateHasChanged();
+        };
 
-        GenerateReviewButtonHidden = false;
+        await BossApiService.GetReviewStream(CurrentIdea, new CancellationToken());
+        
+        await OnIdeaChanged.InvokeAsync(CurrentIdea);
+        ReviewGenerationCompleted = true;
     }
 }

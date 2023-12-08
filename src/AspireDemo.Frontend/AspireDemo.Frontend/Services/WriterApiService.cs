@@ -31,7 +31,34 @@ public class WriterApiService(WriterApi.GrpcWriterApi.WriterApi.WriterApiClient 
         }
     }
 
+    public Action<string> PlotUpdateReceivedCallback { get; set; }
 
+    public async Task GetPlotStream(Idea idea , CancellationToken ct)
+    {
+        var request = new WriterApi.GrpcWriterApi.WriterApiRequest
+        {
+            Settings = idea.Genre,
+            WorkingTitle = idea.WorkingTitle,
+            Actors = idea.Actors,
+            AdditionalProps = idea.SpecialProps
+        };
 
+        using var streamingCall = writerApiClient.GetPlotStream(request, cancellationToken: ct);
+
+        try
+        {
+            await foreach (var plotData in streamingCall.ResponseStream.ReadAllAsync(cancellationToken: ct))
+            {
+                if (PlotUpdateReceivedCallback != null)
+                {
+                    PlotUpdateReceivedCallback(plotData.Plot);
+                }
+            }
+        }
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+        {
+            throw;
+        }
+    }
 }
 

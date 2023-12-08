@@ -6,6 +6,7 @@ package BossApi;
 
 service BossApi {
 	rpc GetReview(ReviewRequest) returns (ReviewResponse) {}
+	rpc GetReviewStream(ReviewRequest) returns (stream ReviewResponse) {}
 }
 
 message ReviewRequest {

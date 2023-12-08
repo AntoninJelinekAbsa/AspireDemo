@@ -6,6 +6,7 @@ package WriterApi;
 
 service WriterApi {
 	rpc GetPlot(WriterApiRequest) returns (WriterApiResponse) {}
+	rpc GetPlotStream(WriterApiRequest) returns (stream WriterApiResponse) {}
 }
 
 message WriterApiRequest {

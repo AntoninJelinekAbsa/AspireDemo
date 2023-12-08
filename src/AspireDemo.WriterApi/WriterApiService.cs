@@ -14,8 +14,6 @@ public class WriterApiService: WriterApi.GrpcWriterApi.WriterApi.WriterApiBase
         _configuration = configuration;
     }
 
-    //TODO: try streaming response over gRPC
-
     public override async Task<WriterApiResponse> GetPlot(WriterApiRequest request, ServerCallContext context)
     {
         var prompt =
@@ -39,5 +37,33 @@ public class WriterApiService: WriterApi.GrpcWriterApi.WriterApi.WriterApiBase
         {
             Plot = response.Response.Replace("\n", " ")
         };
+    }
+
+
+    public override async Task GetPlotStream(WriterApiRequest request, IServerStreamWriter<WriterApiResponse> responseStream, ServerCallContext context)
+    {
+        var prompt =
+            $"Create script for a TV series, genre: {request.Settings} and title: {request.WorkingTitle}. Starring actors: {request.Actors}. It should also involve {request.AdditionalProps}";
+
+        _logger.LogInformation($"Prompt: {prompt}");
+
+        // set up the client
+        var uri = new Uri(_configuration["WriterApiUri"]);
+        var ollama = new OllamaApiClient(uri);
+
+        // stream a completion and write to the console
+        // keep reusing the context to keep the chat topic going
+        ConversationContext conversationContextontext = null;
+        conversationContextontext = await ollama.StreamCompletion(prompt, "grrmartin", conversationContextontext,
+            stream =>
+            {
+                responseStream.WriteAsync(new WriterApiResponse
+                {
+                    Plot = stream.Response.Replace("\n", " ")
+                });
+            });
+
+        _logger.LogInformation($"Ollama completed response.");
+        context.Status = new Status(StatusCode.OK, "Ollama completed response.");
     }
 }

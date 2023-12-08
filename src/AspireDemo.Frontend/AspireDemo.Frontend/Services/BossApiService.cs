@@ -1,5 +1,6 @@
 ﻿using AspireDemo.Models.Entities;
 using Grpc.Core;
+using static AspireDemo.WriterApi.GrpcWriterApi.WriterApi;
 
 namespace AspireDemo.Frontend.Services;
 
@@ -25,6 +26,33 @@ public class BossApiService(BossApi.GrpcBossApi.BossApi.BossApiClient bossApiCli
             //|| (ex.StatusCode is StatusCode.Internal && ex.Status.DebugException is TimeoutRejectedException))
         {
             return string.Empty;
+        }
+    }
+
+    public Action<string> ReviewUpdateReceivedCallback { get; set; }
+
+    public async Task GetReviewStream(Idea idea, CancellationToken ct)
+    {
+        var request = new BossApi.GrpcBossApi.ReviewRequest
+        {
+            Plot = idea.Plot
+        };
+
+        using var streamingCall = bossApiClient.GetReviewStream(request, cancellationToken: ct);
+
+        try
+        {
+            await foreach (var reviewData in streamingCall.ResponseStream.ReadAllAsync(cancellationToken: ct))
+            {
+                if (ReviewUpdateReceivedCallback != null)
+                {
+                    ReviewUpdateReceivedCallback(reviewData.Result);
+                }
+            }
+        }
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+        {
+            throw;
         }
     }
 }

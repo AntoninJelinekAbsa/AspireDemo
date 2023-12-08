@@ -134,7 +134,17 @@ internal class IdeasDbInitializer(IServiceProvider serviceProvider, ILogger<Idea
                 new Actor { FirstName = "Halle", LastName = "Berry" },
                 new Actor { FirstName = "Jennifer", LastName = "Lawrence" },
             };
+        }
 
+        static Idea GetPreconfiguredIdea()
+        {
+            return new Idea
+            {
+                WorkingTitle = "Romance on Nile",
+                Genre = "Western",
+                Actors = "Arnold Schwarzenegger, Sandra Bullock and Sean Connery",
+                SpecialProps = "Spaceships, Horses and Redis databases"
+            };
         }
 
         if (!dbContext.Genres.Any())
@@ -170,6 +180,15 @@ internal class IdeasDbInitializer(IServiceProvider serviceProvider, ILogger<Idea
 
             logger.LogInformation("Seeding {ActorsCount} actors", actors.Count);
 
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        if (!dbContext.Ideas.Any())
+        {
+            var idea = GetPreconfiguredIdea();
+
+            await dbContext.Ideas.AddAsync(idea, cancellationToken);
+            logger.LogInformation("Seeding preconfigured idea");
             await dbContext.SaveChangesAsync(cancellationToken);
         }
     }
