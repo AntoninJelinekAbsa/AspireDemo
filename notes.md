@@ -23,6 +23,60 @@ Deployment
 ```
 
 
+How to prepare ollama model on Windows
+https://ollama.ai/
+Not available on Windows yet but there is an official docker container.
+However, to work with it in Docker container, you'll likely not have internet access from within the container to pull the model from the internet. 
+The problem is zscaler root certificate. What you can do is to create your own ollama container with proper certificate installed.
+- find your zscaler root certificate as .cer file
+- prepare your dockerfile:
+```
+FROM ollama/ollama
+COPY ./zsc-cert.cer /etc/ssl/certs/zsc-cert.cer
+COPY ./zsc-cert.cer /etc/ssl/certs/ca-certificates.crt
+RUN update-ca-certificates
+```
+
+- build your image:
+```
+docker buildx build --rm  -t ollama-custom:latest .
+```
+
+- run your image:
+```
+docker run ollama-custom
+```
+
+- attach a shell to your docker container and run ollama commands:
+```
+ollama --help
+ollama pull orca-mini     //pull orca-mini model. For list of available models, see https://github.com/jmorganca/ollama#model-library
+```
+
+Create a ``Modelfile`` inside your container:
+```
+FROM orca-mini
+
+# set the temperature to 1 [higher is more creative, lower is more coherent]
+PARAMETER temperature .7
+
+# set the system prompt
+SYSTEM 
+You are George Raymond Richard Martin, recognized author of fantasy sagas. You are famous for writing very long novels. You are also extremely known for not finishing your novels. Answer as George Raymond Richard Martin, only.
+```
+
+Inside your conatiner, run:
+```
+ollama create grrmartin -f Modelfile	//create a model called grrmartin
+```
+
+Capture the state of your container:
+```
+docker ps   //to get the container id
+docker commit <container-id> <your-model-name>:latest
+```
+
+
 
 
 Links:

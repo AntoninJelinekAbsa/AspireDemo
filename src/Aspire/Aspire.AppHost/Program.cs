@@ -9,7 +9,7 @@ var seriesService = builder.AddProject<Projects.AspireDemo_SeriesService>("serie
 var writerAi = builder.AddContainer("writerAiApi", "grrmartin")
         .WithServiceBinding(containerPort: 11434, hostPort: 11434, name: writeAiApiEndpointName, scheme: "http");
 
-var bossAi = builder.AddContainer("bossAiApi", "elon")
+var bossAi = builder.AddContainer("bossAiApi", "simpleboss")
     .WithServiceBinding(containerPort: 11434, hostPort: 11435, name: bossAiApiEndpointName, scheme: "http");
 
 var writerApi = builder.AddProject<Projects.AspireDemo_WriterApi>("writerApi")

@@ -16,7 +16,7 @@ public class BossApiService : GrpcBossApi.BossApi.BossApiBase
 
     public override async Task<ReviewResponse> GetReview(ReviewRequest request, ServerCallContext context)
     {
-        var prompt = $"Analyze following TV series plot and decide whether you like it or not: {request.Plot}";
+        var prompt = $"{request.Plot}";
 
         _logger.LogInformation($"Prompt: {prompt}");
 
@@ -27,7 +27,7 @@ public class BossApiService : GrpcBossApi.BossApi.BossApiBase
         // stream a completion and write to the console
         // keep reusing the context to keep the chat topic going
         ConversationContext conversationContextontext = null;
-        var response = await ollama.GetCompletion(prompt, "nikola", conversationContextontext);
+        var response = await ollama.GetCompletion(prompt, "simpleboss", conversationContextontext);
 
         _logger.LogInformation($"Response: {response.Response}");
 
@@ -40,7 +40,7 @@ public class BossApiService : GrpcBossApi.BossApi.BossApiBase
 
     public override async Task GetReviewStream(ReviewRequest request, IServerStreamWriter<ReviewResponse> responseStream, ServerCallContext context)
     {
-        var prompt = $"Analyze following TV series plot and decide whether you like it or not: {request.Plot}";
+        var prompt = $"{request.Plot}";
 
         _logger.LogInformation($"Prompt: {prompt}");
 
@@ -51,7 +51,7 @@ public class BossApiService : GrpcBossApi.BossApi.BossApiBase
         // stream a completion and write to the console
         // keep reusing the context to keep the chat topic going
         ConversationContext conversationContextontext = null;
-        conversationContextontext = await ollama.StreamCompletion(prompt, "nikola", conversationContextontext,
+        conversationContextontext = await ollama.StreamCompletion(prompt, "simpleboss", conversationContextontext,
             stream => {
                 responseStream.WriteAsync(new ReviewResponse
                 {
