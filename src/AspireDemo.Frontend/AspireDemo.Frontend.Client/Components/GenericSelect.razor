@@ -3,11 +3,11 @@
 @inject ILogger<GenericSelect<TItem>> Logger
 
 <div class="row">
-    <label for="@GeneratedId" class="col-lg-2 col-form-label">@LabelText</label>
+    <label class="col-lg-2 col-form-label">@LabelText</label>
     <div class="col-lg-10">
         <div class="d-flex align-items-center">
 
-            <select id="@GeneratedId" name="@GeneratedId" @onchange="ItemChanged" class="form-select">
+            <select @onchange="ItemChanged" class="form-select">
                 @if (SelectedItem is null || SelectedItem.Id == 0)
                 {
                     <option selected value="0">None</option>
@@ -40,9 +40,6 @@
     public string LabelText { get; set; }
 
     [Parameter]
-    public string GeneratedId { get; set; }
-    
-    [Parameter]
     public List<TItem> Items { get; set; }
 
     [Parameter]
@@ -68,7 +65,7 @@
 
     private async Task Remove()
     {
-        Logger.LogDebug($"[ItemSelect] - Removing item at index {Index}");
+        Logger.LogInformation($"[ItemSelect] - Removing item at index {Index}");
         await OnRemove.InvokeAsync(Index);
         StateHasChanged();
     }

@@ -4,12 +4,11 @@
 
 @for (int i = 0; i < SelectedItems.Count; i++)
 {
-    Logger.LogDebug($"[MultiSelector] - Rendering item at index {i}");
+    Logger.LogInformation($"[MultiSelector] - Rendering item at index {i}");
     <GenericSelect 
         TItem="TItem"
         Items="Items"
         LabelText="@Label"
-        GeneratedId="@GeneratedId(i)"
         Index="i"
         OnRemove="ItemRemovedCallback"
         OnItemChanged="ItemChangedCallback"
@@ -43,7 +42,7 @@
 
     private async Task ItemRemovedCallback(int index)
     {
-        Logger.LogDebug($"[MultiSelector] - Removing actor at index {index}");
+        Logger.LogInformation($"[MultiSelector] - Removing actor at index {index}");
         SelectedItems.RemoveAt(index);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
         StateHasChanged();
@@ -80,6 +79,4 @@
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
         }
     }
-
-    private string GeneratedId(int index) => $"{Label}{index}".Replace(" ", "");
 }
