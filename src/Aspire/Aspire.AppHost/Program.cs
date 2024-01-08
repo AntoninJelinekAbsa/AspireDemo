@@ -6,10 +6,10 @@ const string bossAiApiEndpointName = "bossAiApi";
 var seriesDb = builder.AddPostgresContainer("postgres").AddDatabase("seriesdb");
 var seriesService = builder.AddProject<Projects.AspireDemo_SeriesService>("seriesService").WithReference(seriesDb);
 
-var writerAi = builder.AddContainer("writerAiApi", "grrmartin")
+var writerAi = builder.AddContainer("writerAiApi", "grrmartin-real")
         .WithServiceBinding(containerPort: 11434, hostPort: 11434, name: writeAiApiEndpointName, scheme: "http");
 
-var bossAi = builder.AddContainer("bossAiApi", "simpleboss")
+var bossAi = builder.AddContainer("bossAiApi", "simpleboss-real")
     .WithServiceBinding(containerPort: 11434, hostPort: 11435, name: bossAiApiEndpointName, scheme: "http");
 
 var writerApi = builder.AddProject<Projects.AspireDemo_WriterApi>("writerApi")

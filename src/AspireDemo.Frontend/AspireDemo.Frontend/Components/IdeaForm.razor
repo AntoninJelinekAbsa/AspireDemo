@@ -5,81 +5,100 @@
 @using AspireDemo.Frontend.Extensions
 
 @attribute [StreamRendering]
-
 @inject SeriesApiClient ApiClient
 
-<h1>@Mode Idea</h1>
+<div class="container-md p-3 col-xxl-7 col-xl-9 col-lg-10">
 
-<hr />
-@if(Genres is null || Actors is null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    @if (Idea is not null)
+    <h1 class="fs-2">@Mode Idea</h1>
+
+    @if(Genres is null || Actors is null)
     {
-        <EditForm Model="@Idea"
-                  OnInvalidSubmit="(async () => await HandleSubmitAsync(false))"
-                  OnValidSubmit="(async () => await HandleSubmitAsync(true))">
-            <DataAnnotationsValidator/>
-            <ValidationSummary/>
-
-            <p>
-                <label>
-                    Working title:
-                    <InputText @bind-Value="Idea.WorkingTitle"/>
-                </label>
-            </p>
-            <p>
-                <label>
-                    Genre:
-                    <InputSelect @bind-Value="Idea.Genre">
-                        @if (Idea is null)
-                        {
-                            <option selected value="">None</option>
-                        }
-
-                        @foreach (var genre in Genres)
-                        {
-                            <option value="@genre.Name">@genre.Name</option>
-                        }
-                    </InputSelect>
-                </label>
-            </p>
-
-            <p>
-                <h3>Actors</h3>
-                <MultiSelector 
-                    TItem="Actor" 
-                    Items="Actors" 
-                    Label="Actor"
-                    @bind-SelectedItems="SelectedActors">
-                </MultiSelector>
-            </p>
-            
-            <p>
-                <h3>Special props</h3>
-                <MultiSelector 
-                    TItem="SpecialProp" 
-                    Items="SpecialProps" 
-                    Label="Special property"
-                    @bind-SelectedItems="SelectedSpecialProps">
-                </MultiSelector>
-            </p>
-
-            <br/>
-            <button disabled="@Busy" class="btn btn-warning"
-                    @onclick="CancelAsync">
-                Cancel
-            </button>&nbsp;
-            <button disabled="@Busy" type="submit"
-                    class="btn btn-primary">
-                Submit
-            </button>
-        </EditForm>
+        <p><em>Loading...</em></p>
     }
-}
+    else
+    {
+        @if (Idea is not null)
+        {
+            <EditForm Model="@Idea"
+                      OnInvalidSubmit="(async () => await HandleSubmitAsync(false))"
+                      OnValidSubmit="(async () => await HandleSubmitAsync(true))">
+                    <DataAnnotationsValidator/>
+                    <ValidationSummary/>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0 text-muted"><i class="bi bi-film me-2"></i>Title & Genre</h5>
+                        </div>
+                    
+                        <div class="card-body">
+                            <div class="d-grid gap-3">
+                                <div class="row">
+                                    <label for="@Idea.WorkingTitle" class="col-lg-2 col-form-label">Working title</label>
+                                    <div class="col-lg-10">
+                                        <InputText @bind-Value="Idea.WorkingTitle" class="valid form-control"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="@Idea.Genre" class="col-lg-2 col-form-label">Genre</label>
+                                    <div class="col-lg-10">
+                                        <InputSelect @bind-Value="Idea.Genre" class="valid form-select">
+                                            @if (Idea is null)
+                                            {
+                                                <option selected value="">None</option>
+                                            }
+
+                                            @foreach (var genre in Genres)
+                                            {
+                                                <option value="@genre.Name">@genre.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-muted"><i class="bi bi-person-video2 me-2"></i>Actors</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-3">
+                            <MultiSelector 
+                                TItem="Actor" 
+                                Items="Actors" 
+                                Label="Actor"
+                                @bind-SelectedItems="SelectedActors">
+                            </MultiSelector>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-muted"><i class="bi bi-bookmarks me-2"></i>Special props</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-3">
+                            <MultiSelector 
+                                TItem="SpecialProp" 
+                                Items="SpecialProps" 
+                                Label="Special property"
+                                @bind-SelectedItems="SelectedSpecialProps">
+                            </MultiSelector>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="my-4 d-flex justify-content-between">
+                    <button disabled="@Busy" @onclick="CancelAsync" class="btn btn-outline-secondary px-4"><i class="bi bi-x-lg me-2"></i>Cancel</button>
+                    <button disabled="@Busy" type="submit" class="btn btn-success px-4"><i class="bi bi-send-plus me-3"></i>Submit Idea</button>
+                </div>    
+            </EditForm>
+        }
+    }
+</div>
+
 
 @code {
     // Let parent handle result of validation.

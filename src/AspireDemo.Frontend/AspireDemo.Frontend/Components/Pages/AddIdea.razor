@@ -74,6 +74,9 @@
             // Ready for the next.
             Idea = new();
             Busy = false;
+            
+            // Back to list.          
+            Navigation.NavigateTo($"/{PageHelper.Page}");
         }
         catch (Exception ex)
         {

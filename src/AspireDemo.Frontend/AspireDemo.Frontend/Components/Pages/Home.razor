@@ -12,94 +12,78 @@
 
 <PageTitle>Cool streaming - Ideas</PageTitle>
 
-<h1>Series ideas and status</h1>
-
-<GridWrapper @ref="Wrapper"
-             FilterChanged="ReloadAsync"
-             DeleteRequested="id => Wrapper.DeleteRequestId = id">
-    <div class="container-fluid contacts-grid">
-        @* <div class="row">
-            <div class="col-4"><NameToggle /></div>
-            <div class="col-8"><TextFilter /></div>
+<main>
+    <header class="p-3 text-bg-dark mb-3">
+        <div class="container-fluid align-items-left">
+            <span class="fs-3">
+                Cool streaming - Ideas
+            </span>
         </div>
-        <div class="row">&nbsp;</div>
-        <div class="row">
-            <div class="col-6">
-                Page @Filters.PageHelper.Page of @Filters.PageHelper.PageCount:
-                showing @Filters.PageHelper.PageItems of
-                @Filters.PageHelper.TotalItemCount items.
-                <a disabled="@(Filters.Loading || !Filters.PageHelper.HasPrev)"
-                   class="btn btn-primary @IsDisabled(Filters.PageHelper.HasPrev)"
-                   href="@Filters.PageHelper.PrevPage">
-                    Previous
-                </a>
-                <a disabled="@(Filters.Loading || !Filters.PageHelper.HasNext)"
-                   class="btn btn-primary @IsDisabled(Filters.PageHelper.HasNext)"
-                   href="@Filters.PageHelper.NextPage">
-                    Next
-                </a>
-            </div>
-        </div> *@
-        <div class="row">&nbsp;</div>
-        <div class="row contact-header">
-            <div class="col-1"
-                 @onclick="@(async ()=>await ToggleAsync(IdeaFilterColumns.Title))">
-                <SortIndicator Column="@(IdeaFilterColumns.Title)" />&nbsp;Title
-            </div>
-            <div class="col-1"
-                 @onclick="@(async ()=>await ToggleAsync(IdeaFilterColumns.Genre))">
-                <SortIndicator Column="@(IdeaFilterColumns.Genre)" />&nbsp;Genre
-            </div>
-            <div class="col-2"
-                 @onclick="@(async ()=>await ToggleAsync(IdeaFilterColumns.Actors))">
-                <SortIndicator Column="@(IdeaFilterColumns.Actors)" />&nbsp;Actors
-            </div>
-            <div class="col-1"
-                 @onclick="@(async ()=>await ToggleAsync(IdeaFilterColumns.SpecialProps))">
-                <SortIndicator Column="@(IdeaFilterColumns.SpecialProps)" />&nbsp;Additional settings
-            </div>
-            <div class="col-4">
-                Plot
-            </div>
-            <div class="col-3">
-                Boss review
-            </div>
-           
+      </header>
 
-        </div>
-        @if (Filters.Loading || Ideas is null)
-        {
-            <div class="row">
-                <div class="col-12 alert alert-info">
-                    Loading...
+    <div class="container-fluid pb-3">
+
+        <GridWrapper @ref="Wrapper"
+                     FilterChanged="ReloadAsync"
+                     DeleteRequested="id => Wrapper.DeleteRequestId = id">
+            
+                <div class="row text-bg-primary p-2 mb-3 fw-bold">
+                    <div class="col-1">
+                        Title
+                    </div>
+                    <div class="col-1">
+                        Genre
+                    </div>
+                    <div class="col-2">
+                        Actors
+                    </div>
+                    <div class="col-1">
+                        Additional settings
+                    </div>
+                    <div class="col-5">
+                        Plot
+                    </div>
+                    <div class="col-2">
+                        Boss review
+                    </div>
+                   
+        
                 </div>
-            </div>
-        }
-        @if (Ideas is not null && Ideas.Count == 0)
-        {
-            <div class="row">
-                <div class="col-12 alert alert-warning">
-                    No ideas found.
-                </div>
-            </div>
-        }
-        @if (Ideas is not null)
-        {
-            @foreach (var idea in Ideas)
-            {
-                <IdeaRow 
-                    @key=idea 
-                    CurrentIdea="@idea"
-                    DeleteIdea="DeleteIdeaAsync"
-                    OnIdeaChanged="UpdateIdeaAsync"/>
-            }
-        }
+                @if (Filters.Loading || Ideas is null)
+                {
+                    <div class="row">
+                        <div class="col-12 alert alert-info">
+                            Loading...
+                        </div>
+                    </div>
+                }
+                @if (Ideas is not null && Ideas.Count == 0)
+                {
+                    <div class="row">
+                        <div class="col-12 alert alert-warning">
+                            No ideas found.
+                        </div>
+                    </div>
+                }
+                @if (Ideas is not null)
+                {
+                    @foreach (var idea in Ideas)
+                    {
+                        <IdeaRow 
+                            @key=idea 
+                            CurrentIdea="@idea"
+                            DeleteIdea="DeleteIdeaAsync"
+                            OnIdeaChanged="UpdateIdeaAsync"/>
+                    }
+                }
+            
+        </GridWrapper>
+        
+        <NavLink class="nav-link" href="add">
+            <span class="oi oi-plus" aria-hidden="true"></span> Add New Idea
+        </NavLink>
     </div>
-</GridWrapper>
-
-<NavLink class="nav-link" href="add">
-    <span class="oi oi-plus" aria-hidden="true"></span> Add New Idea
-</NavLink>
+</main>
 
 @code
 {

@@ -140,7 +140,7 @@ internal class IdeasDbInitializer(IServiceProvider serviceProvider, ILogger<Idea
         {
             return new Idea
             {
-                WorkingTitle = "Romance on Nile",
+                WorkingTitle = "Cape Town romance",
                 Genre = "Western",
                 Actors = "Arnold Schwarzenegger, Sandra Bullock and Sean Connery",
                 SpecialProps = "Spaceships, Horses and Redis databases"

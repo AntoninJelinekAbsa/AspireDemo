@@ -55,7 +55,7 @@ ollama pull orca-mini     //pull orca-mini model. For list of available models, 
 
 Create a ``Modelfile`` inside your container:
 ```
-FROM orca-mini
+FROM llama2
 
 # set the temperature to 1 [higher is more creative, lower is more coherent]
 PARAMETER temperature .7

@@ -1,31 +1,25 @@
-﻿
-@typeparam TItem where TItem : ISelectableItem, new()
+﻿@typeparam TItem where TItem : ISelectableItem, new()
 
 @inject ILogger<MultiSelector<TItem>> Logger
 
-<div class="row">
-    <div class="col">
-        @for (int i = 0; i < SelectedItems.Count; i++)
-        {
-            Logger.LogDebug($"[MultiSelector] - Rendering item at index {i}");
-            <GenericSelect 
-                TItem="TItem"
-                Items="Items"
-                Label="@Label"
-                Index="i"
-                OnRemove="ItemRemovedCallback"
-                OnItemChanged="ItemChangedCallback"
-                SelectedItem="@SelectedItems[i]">
-            </GenericSelect>
-        }
-    </div>
+@for (int i = 0; i < SelectedItems.Count; i++)
+{
+    Logger.LogDebug($"[MultiSelector] - Rendering item at index {i}");
+    <GenericSelect 
+        TItem="TItem"
+        Items="Items"
+        LabelText="@Label"
+        GeneratedId="@GeneratedId(i)"
+        Index="i"
+        OnRemove="ItemRemovedCallback"
+        OnItemChanged="ItemChangedCallback"
+        SelectedItem="@SelectedItems[i]">
+    </GenericSelect>
+}
+    
+<div>
+    <button type="button" class="btn btn-sm btn-outline-primary px-3" @onclick="AddItem"><i class="bi bi-bookmark-plus me-2"></i>Add another</button>
 </div>
-<div class="row">
-    <div class="col">
-        <button type="button" class="btn btn-primary" @onclick="AddItem">Add another</button>
-    </div>
-</div>
-
 
 @code
 {
@@ -86,4 +80,6 @@
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
         }
     }
+
+    private string GeneratedId(int index) => $"{Label}{index}".Replace(" ", "");
 }

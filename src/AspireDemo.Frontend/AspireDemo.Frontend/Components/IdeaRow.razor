@@ -9,19 +9,16 @@
 
 @if (CurrentIdea is not null)
 {
-    <div class="row contact-detail">
-        <div class="col-1">
-            <a href="@ViewLink" alt="View Details"
-               title="View Details">
-                @CurrentIdea.WorkingTitle
-            </a>
+    <div class="row mb-2 p-1">
+        <div class="col-1 fw-bold">
+            @CurrentIdea.WorkingTitle
         </div>
         @if (!DeleteConfirmation)
         {
             <div class="col-1">@CurrentIdea.Genre</div>
             <div class="col-2">@CurrentIdea.Actors</div>
             <div class="col-1">@CurrentIdea.SpecialProps</div>
-            <div class="col-4">
+            <div class="col-5">
                 @if (!string.IsNullOrWhiteSpace(CurrentIdea.Plot))
                 {
                     @CurrentIdea.Plot
@@ -38,7 +35,7 @@
                     </div>
                 }
             </div>
-            <div class="col-3">
+            <div class="col-2 fw-bolder">
                 @if (!string.IsNullOrEmpty(CurrentIdea.BossReview))
                 {
                     @CurrentIdea.BossReview
@@ -66,23 +63,6 @@
             </div>
         }
         
-        
-       @*  <div class="col-1 text-right">
-            <a title="Edit" href="edit/@CurrentIdea.Id" style="text-decoration:none">
-                &nbsp;📝&nbsp;
-            </a>
-            @if (CanDelete)
-            {
-                <span @onclick="DeleteRequestAsync"
-                      title="Delete" class="clickable red">❌</span>
-            }
-            else
-            {
-                <span>&nbsp;</span>
-            }
-            &nbsp;
-        </div> *@
-
     </div>
 }
 
