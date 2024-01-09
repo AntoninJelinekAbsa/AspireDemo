@@ -2,20 +2,22 @@
 
 @inject ILogger<MultiSelector<TItem>> Logger
 
-@for (int i = 0; i < SelectedItems.Count; i++)
-{
-    Logger.LogInformation($"[MultiSelector] - Rendering item at index {i}");
-    <GenericSelect 
-        TItem="TItem"
-        Items="Items"
-        LabelText="@Label"
-        Index="i"
-        OnRemove="ItemRemovedCallback"
-        OnItemChanged="ItemChangedCallback"
-        SelectedItem="@SelectedItems[i]">
-    </GenericSelect>
-}
-    
+<span>
+    @for (int i = 0; i < SelectedItems.Count; i++)
+    {
+        Logger.LogInformation($"[MultiSelector {typeof(TItem)}] - Rendering item at index {i}");
+        <GenericSelect 
+            TItem="TItem"
+            Items="Items"
+            LabelText="@Label"
+            Index="i"
+            OnRemove="ItemRemovedCallback"
+            OnItemChanged="ItemChangedCallback"
+            SelectedItem="@SelectedItems[i]">
+        </GenericSelect>
+    }
+</span>
+
 <div>
     <button type="button" class="btn btn-sm btn-outline-primary px-3" @onclick="AddItem"><i class="bi bi-bookmark-plus me-2"></i>Add another</button>
 </div>
@@ -45,7 +47,7 @@
         Logger.LogInformation($"[MultiSelector] - Removing actor at index {index}");
         SelectedItems.RemoveAt(index);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
-        StateHasChanged();
+        //StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()

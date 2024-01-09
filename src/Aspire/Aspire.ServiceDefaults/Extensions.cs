@@ -23,13 +23,12 @@ public static class Extensions
         builder.Services.ConfigureHttpClientDefaults(http =>
         {
             // Turn on resilience by default
-            //http.AddStandardResilienceHandler(options =>
-            //{
-            //    options.TotalRequestTimeout = new HttpTimeoutStrategyOptions()
-            //    {
-            //        Timeout = TimeSpan.FromSeconds(300)
-            //    };
-            //});
+            http.AddStandardResilienceHandler(options => {
+                options.TotalRequestTimeout = new HttpTimeoutStrategyOptions()
+                {
+                    Timeout = TimeSpan.FromSeconds(300)
+                };
+            });
 
             // Turn on service discovery by default
             http.UseServiceDiscovery();

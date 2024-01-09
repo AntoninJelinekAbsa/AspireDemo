@@ -6,6 +6,7 @@
 
 @attribute [StreamRendering]
 @inject SeriesApiClient ApiClient
+@inject ILogger<IdeaForm> Logger
 
 <div class="container-md p-3 col-xxl-7 col-xl-9 col-lg-10">
 
@@ -186,15 +187,20 @@
     // isValid: True when field validation passed.
     private Task HandleSubmitAsync(bool isValid)
     {
+        Logger.LogInformation("----Submitted");
+        
         if (SelectedActors.Count > 2
             && SelectedSpecialProps.Count > 2
             && !string.IsNullOrEmpty(Idea.WorkingTitle)
             && !string.IsNullOrEmpty(Idea.Genre))
         {
+            Logger.LogInformation("----Submitted -> VALID");
+            
             Idea.Actors = JoinItemsWithAndAtTheEnd(SelectedActors.Select(x => x.Value).ToList());
             Idea.SpecialProps = JoinItemsWithAndAtTheEnd(SelectedSpecialProps.Select(x => x.Value).ToList());
             return ValidationResult.InvokeAsync(true);
         }
+        Logger.LogInformation("----Submitted -> INVALID");
         return ValidationResult.InvokeAsync(false);
     }
 

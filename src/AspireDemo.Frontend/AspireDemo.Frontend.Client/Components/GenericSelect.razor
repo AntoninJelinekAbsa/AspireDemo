@@ -17,7 +17,6 @@
                 {
                     if (SelectedItem is not null && item.Id == SelectedItem.Id)
                     {
-                        Logger.LogDebug($"[ItemSelect] - Setting selected item to {item.Value}");
                         <option selected value="@item.Id">@item.Value</option>
                     }
                     else
@@ -67,6 +66,6 @@
     {
         Logger.LogInformation($"[ItemSelect] - Removing item at index {Index}");
         await OnRemove.InvokeAsync(Index);
-        StateHasChanged();
+        //StateHasChanged();
     }
 }
